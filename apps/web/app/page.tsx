@@ -130,22 +130,22 @@ export default function Home() {
               Advanced settings
               <Settings2 size={18} />
             </p>
-            <div className="flex flex-col gap-6 w-full">
+            <div className="flex flex-col gap-7 w-full">
               <div>
-                <p className="opacity-50 mb-2 text-sm">Token delay</p>
-                <Slider defaultValue={[tokenDelay]} max={1000} step={1} />
+                <p className="opacity-50 mb-3 text-sm">Token delay: {tokenDelay} ms</p>
+                <Slider defaultValue={[tokenDelay]} max={1000} step={1} onValueChange={(values) => setTokenDelay((values[0] ?? 1))} />
               </div>
               <div>
-                <p className="opacity-50 mb-2 text-sm">Short pause</p>
-                <Slider defaultValue={[shortPause]} max={1000} step={1} />
+                <p className="opacity-50 mb-3 text-sm">Short pause: {shortPause} ms</p>
+                <Slider defaultValue={[shortPause]} max={1000} step={1} onValueChange={(values) => setShortPause((values[0] ?? 1))} />
               </div>
               <div>
-                <p className="opacity-50 mb-2 text-sm">Long pause</p>
-                <Slider defaultValue={[longPause]} max={1000} step={1} />
+                <p className="opacity-50 mb-3 text-sm">Long pause: {longPause} ms</p>
+                <Slider defaultValue={[longPause]} max={1000} step={1} onValueChange={(values) => setLongPause((values[0] ?? 1))} />
               </div>
               <div>
-                <p className="opacity-50 mb-2 text-sm">Reveal animation</p>
-                <Slider defaultValue={[revealAnimation]} max={1000} step={1} />
+                <p className="opacity-50 mb-3 text-sm">Reveal animation: {revealAnimation} ms</p>
+                <Slider defaultValue={[revealAnimation]} max={1000} step={1} onValueChange={(values) => setRevealAnimation((values[0] ?? 1))} />
               </div>
             </div>
           </div>
@@ -156,10 +156,10 @@ export default function Home() {
               <SquareFunction size={18} />
             </p>
             <div className="flex items-center gap-2">
-              <p className="px-3 py-1 rounded-md text-xs bg-zinc-700 opacity-80">{tokenDelay}</p>
-              <p className="px-3 py-1 rounded-md text-xs bg-zinc-700 opacity-80">{shortPause}</p>
-              <p className="px-3 py-1 rounded-md text-xs bg-zinc-700 opacity-80">{longPause}</p>
-              <p className="px-3 py-1 rounded-md text-xs bg-zinc-700 opacity-80">{revealAnimation}</p>
+              <p className="w-12 text-center py-1 rounded-md text-xs bg-zinc-700 opacity-80">{tokenDelay}</p>
+              <p className="w-12 text-center py-1 rounded-md text-xs bg-zinc-700 opacity-80">{shortPause}</p>
+              <p className="w-12 text-center py-1 rounded-md text-xs bg-zinc-700 opacity-80">{longPause}</p>
+              <p className="w-12 text-center py-1 rounded-md text-xs bg-zinc-700 opacity-80">{revealAnimation}</p>
               <Button variant="ghost" className="text-zinc-300 rounded-full cursor-pointer"><Copy /></Button>
             </div>
           </div>
