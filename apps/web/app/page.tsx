@@ -113,7 +113,7 @@ export default function Home() {
         <section className="border-l-4 border-zinc-800/70 py-5 px-15 flex flex-col gap-14">
 
           <div>
-            <p className="mb-3 opacity-50 flex items-center gap-2">
+            <p className="mb-4 opacity-50 flex items-center gap-2">
               Reading speed
               <Glasses size={18} />
             </p>
@@ -126,10 +126,9 @@ export default function Home() {
           </div>
 
           <div>
-            <p className="mb-3 opacity-50 flex items-center gap-2">
-              Advanced settings
-              <Settings2 size={18} />
-            </p>
+            <div className="flex justify-between items-center">
+              <p className="mb-4 opacity-50 flex items-center gap-2 w-full">Advanced settings<Settings2 size={18} /><Copy className="cursor-pointer ml-auto" size={16} /></p>
+            </div>
             <div className="flex flex-col gap-7 w-full">
               <div>
                 <p className="opacity-50 mb-3 text-sm">Token delay: {tokenDelay} ms</p>
@@ -147,20 +146,6 @@ export default function Home() {
                 <p className="opacity-50 mb-3 text-sm">Reveal animation: {revealAnimation} ms</p>
                 <Slider defaultValue={[revealAnimation]} max={1000} step={1} onValueChange={(values) => setRevealAnimation((values[0] ?? 1))} />
               </div>
-            </div>
-          </div>
-
-          <div>
-            <p className="mb-3 opacity-50 flex items-center gap-2">
-              Cadence arguments
-              <SquareFunction size={18} />
-            </p>
-            <div className="flex items-center gap-2">
-              <p className="w-12 text-center py-1 rounded-md text-xs bg-zinc-700 opacity-80">{tokenDelay}</p>
-              <p className="w-12 text-center py-1 rounded-md text-xs bg-zinc-700 opacity-80">{shortPause}</p>
-              <p className="w-12 text-center py-1 rounded-md text-xs bg-zinc-700 opacity-80">{longPause}</p>
-              <p className="w-12 text-center py-1 rounded-md text-xs bg-zinc-700 opacity-80">{revealAnimation}</p>
-              <Button variant="ghost" className="text-zinc-300 rounded-full cursor-pointer"><Copy /></Button>
             </div>
           </div>
         </section>
