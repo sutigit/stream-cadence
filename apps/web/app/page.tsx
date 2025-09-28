@@ -8,8 +8,6 @@ import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Copy, Glasses, Rabbit, Settings2 } from "lucide-react";
 
-// import { hello } from "@repo/stream-cadence/hello"
-
 import "./cadence.css"
 import { cn } from "@/lib/utils";
 
