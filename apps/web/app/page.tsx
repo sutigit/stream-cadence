@@ -1,13 +1,16 @@
 'use client';
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ChatInput from "../components/chat-input";
 import { streamResponse } from "./api/openai/utils";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider"
-import { Copy, Glasses, Parentheses, Settings2, SquareFunction } from "lucide-react";
+import { Copy, Glasses, Settings2 } from "lucide-react";
+
+// import { hello } from "@repo/stream-cadence/hello"
 
 import "./cadence.css"
+import { cn } from "@/lib/utils";
 
 type Seg = { id: string; text: string; anim: "normal" | "short" | "long" | "space" };
 
@@ -24,6 +27,7 @@ export default function Home() {
   const [shortPause, setShortPause] = useState<number>(300)
   const [longPause, setLongPause] = useState<number>(800)
   const [revealAnimation, setRevealAnimation] = useState<number>(500)
+  const [readSpeed, setReadSpeed] = useState<string>('fast')
 
   // cadence tracker
   const lastEmitRef = useRef<number>(performance.now());
@@ -49,12 +53,13 @@ export default function Home() {
       }
       return next;
     });
+  }
 
-    // autoscroll
+  useEffect(() => {
     queueMicrotask(() => {
       scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
     });
-  }
+  }, [segs])
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -71,6 +76,12 @@ export default function Home() {
         (chunk) => appendChunk(chunk),
         { wordPauseMs: 115, shortPauseMs: 350, longPauseMs: 700 }
       );
+
+      // target dx
+      // applyCadence(setInput, 115, 350, 700, 500) // pass number arguments
+      // applyCadence(setInput, tokenDelay, shortPause, longPause, revelAnimation) // pass number type states
+      // applyCadence(setInput, 'average') // pass enum type 'slow' | 'average' | 'fast'
+
     } finally {
       setLoading(false);
     }
@@ -118,10 +129,10 @@ export default function Home() {
               <Glasses size={18} />
             </p>
             <div className="flex items-center gap-3">
-              <Button className="rounded-full cursor-pointer bg-zinc-400 px-5">Slow</Button>
-              <Button className="rounded-full cursor-pointer bg-zinc-400 px-5">Average</Button>
-              <Button className="rounded-full cursor-pointer bg-zinc-400 px-5">Fast</Button>
-              <Button className="rounded-full cursor-pointer bg-zinc-400 px-5">Custom</Button>
+              <Button onClick={() => setReadSpeed('slow')} className={cn("rounded-full cursor-pointer px-5", readSpeed === 'slow' ? 'bg-zinc-100' : 'bg-zinc-500')}>Slow</Button>
+              <Button onClick={() => setReadSpeed('average')} className={cn("rounded-full cursor-pointer px-5", readSpeed === 'average' ? 'bg-zinc-100' : 'bg-zinc-500')}>Average</Button>
+              <Button onClick={() => setReadSpeed('fast')} className={cn("rounded-full cursor-pointer px-5", readSpeed === 'fast' ? 'bg-zinc-100' : 'bg-zinc-500')}>Fast</Button>
+              <Button onClick={() => setReadSpeed('custom')} className={cn("rounded-full cursor-pointer px-5", readSpeed === 'custom' ? 'bg-zinc-100' : 'bg-zinc-500')}>Custom</Button>
             </div>
           </div>
 
