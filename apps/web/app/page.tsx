@@ -18,7 +18,7 @@ type Seg = { id: string; text: string; anim: "normal" | "short" | "long" | "spac
 export default function Home() {
   const [input, setInput] = useState<string>("");
   const [segs, setSegs] = useState<Seg[]>([
-    { id: "init", text: "Buch, buch, buch!", anim: "normal" },
+    { id: "init", text: "Hi! To get started, send me a message using the buttons below, or just type anything you'd like.", anim: "normal" },
   ]);
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -91,15 +91,15 @@ export default function Home() {
   return (
     <main className="container mx-auto h-screen max-h-screen min-h-screen flex">
       <section className="px-20 flex-2 h-full flex flex-col justify-center items-center">
-        <div className="pb-10 flex items-center gap-3 self-end">
+        {/* <div className="pb-10 flex items-center gap-3 self-end">
           <p className="text-sm opacity-50">Ghosting</p>
           <Switch />
-        </div>
+        </div> */}
         <div
           className="w-full flex mb-20 overflow-y-scroll h-[9rem] whitespace-pre-wrap pr-8 scroll-bar"
           ref={scrollRef}
         >
-          <p className="text-xl leading-9">
+          <p className="text-2xl leading-9">
             {segs.length === 0 && (loading ? "…" : null)}
             {segs.map(s =>
               s.anim === "space" ? (
