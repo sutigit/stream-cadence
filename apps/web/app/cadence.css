@@ -9,17 +9,17 @@
 
 /* baseline word */
 .chunk {
-  animation: revealLeft 200ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: revealLeft 400ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* short pause word */
 .chunk-short {
-  animation: revealLeft 420ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: revealLeft 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* long deliberate pause word */
 .chunk-long {
-  animation: revealLeft 840ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: revealLeft 1200ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes revealLeft {
@@ -40,7 +40,7 @@
 
 /* tiny shorten when two normal words follow each other for flow */
 .chunk + .chunk {
-  animation-duration: 500ms;
+  animation-duration: 900ms;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -5,7 +5,8 @@ import ChatInput from "../components/chat-input";
 import { streamResponse } from "./api/openai/utils";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider"
-import { Copy, Glasses, Settings2 } from "lucide-react";
+import { Switch } from "@/components/ui/switch"
+import { Copy, Glasses, Rabbit, Settings2 } from "lucide-react";
 
 // import { hello } from "@repo/stream-cadence/hello"
 
@@ -37,7 +38,7 @@ export default function Home() {
     const dt = now - lastEmitRef.current;
     lastEmitRef.current = now;
 
-    const anim: Seg["anim"] = dt >= 700 ? "long" : dt >= 350 ? "short" : "normal";
+    const anim: Seg["anim"] = dt >= 1000 ? "long" : dt >= 650 ? "short" : "normal";
 
     // split into words and spaces so spaces render instantly
     const parts = chunk.split(/(\s+)/);
@@ -74,7 +75,7 @@ export default function Home() {
       await streamResponse(
         input,
         (chunk) => appendChunk(chunk),
-        { wordPauseMs: 115, shortPauseMs: 350, longPauseMs: 700 }
+        { wordPauseMs: 400, shortPauseMs: 700, longPauseMs: 1200 }
       );
 
       // target dx
@@ -89,8 +90,11 @@ export default function Home() {
 
   return (
     <main className="container mx-auto h-screen max-h-screen min-h-screen flex">
-
       <section className="px-20 flex-2 h-full flex flex-col justify-center items-center">
+        <div className="pb-10 flex items-center gap-3 self-end">
+          <p className="text-sm opacity-50">Ghosting</p>
+          <Switch />
+        </div>
         <div
           className="w-full flex mb-20 overflow-y-scroll h-[9rem] whitespace-pre-wrap pr-8 scroll-bar"
           ref={scrollRef}
@@ -125,8 +129,8 @@ export default function Home() {
 
           <div>
             <p className="mb-4 opacity-50 flex items-center gap-2">
-              Reading speed
-              <Glasses size={18} />
+              Cadence speed
+              <Rabbit size={18} />
             </p>
             <div className="flex items-center gap-3">
               <Button onClick={() => setReadSpeed('slow')} className={cn("rounded-full cursor-pointer px-5", readSpeed === 'slow' ? 'bg-zinc-100' : 'bg-zinc-500')}>Slow</Button>
