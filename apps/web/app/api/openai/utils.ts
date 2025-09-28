@@ -1,11 +1,12 @@
-async function streamResponse(
+async function streamCadence(
   message: string,
   onText: (t: string) => void,
+  wordMs: number, // pause after each word
+  shortMs: number, // pause for "|"
+  longMs: number, // pause for "||"
+  revealMs: number,
   opts?: {
     signal?: AbortSignal;
-    wordPauseMs?: number; // pause after each word
-    shortPauseMs?: number; // pause for "|"
-    longPauseMs?: number; // pause for "||"
   }
 ) {
   const res = await fetch("/api/openai/chat", {
@@ -18,10 +19,6 @@ async function streamResponse(
   const ct = res.headers.get("content-type") || "";
   const reader = res.body!.getReader();
   const dec = new TextDecoder();
-
-  const wordMs = opts?.wordPauseMs ?? 102;
-  const shortMs = opts?.shortPauseMs ?? 334;
-  const longMs = opts?.longPauseMs ?? 710;
 
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -136,4 +133,4 @@ async function streamResponse(
   }
 }
 
-export { streamResponse };
+export { streamCadence };

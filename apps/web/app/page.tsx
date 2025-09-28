@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import ChatInput from "../components/chat-input";
-import { streamResponse } from "./api/openai/utils";
+import { streamCadence } from "./api/openai/utils";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
@@ -18,7 +18,7 @@ type Seg = { id: string; text: string; anim: "normal" | "short" | "long" | "spac
 export default function Home() {
   const [input, setInput] = useState<string>("");
   const [segs, setSegs] = useState<Seg[]>([
-    { id: "init", text: "Hi! To get started, send me a message using the buttons below, or just type anything you'd like.", anim: "normal" },
+    // { id: "init", text: "Hi, to get started, send me a message using the buttons below, or just type anything you'd like.", anim: "normal" },
   ]);
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -72,16 +72,19 @@ export default function Home() {
     lastEmitRef.current = performance.now();
 
     try {
-      await streamResponse(
+      await streamCadence(
         input,
         (chunk) => appendChunk(chunk),
-        { wordPauseMs: 400, shortPauseMs: 700, longPauseMs: 1200 }
+        tokenDelay,
+        shortPause,
+        longPause,
+        revealAnimation
       );
 
       // target dx
-      // applyCadence(setInput, 115, 350, 700, 500) // pass number arguments
-      // applyCadence(setInput, tokenDelay, shortPause, longPause, revelAnimation) // pass number type states
-      // applyCadence(setInput, 'average') // pass enum type 'slow' | 'average' | 'fast'
+      // streamCadence(setInput, 115, 350, 700, 500) // pass number arguments
+      // streamCadence(setInput, tokenDelay, shortPause, longPause, revelAnimation) // pass number type states
+      // streamCadence(setInput, 'average') // pass enum type 'slow' | 'average' | 'fast'
 
     } finally {
       setLoading(false);
@@ -99,7 +102,7 @@ export default function Home() {
           className="w-full flex mb-20 overflow-y-scroll h-[9rem] whitespace-pre-wrap pr-8 scroll-bar"
           ref={scrollRef}
         >
-          <p className="text-2xl leading-9">
+          <p className="text-xl leading-9">
             {segs.length === 0 && (loading ? "…" : null)}
             {segs.map(s =>
               s.anim === "space" ? (
@@ -133,10 +136,10 @@ export default function Home() {
               <Rabbit size={18} />
             </p>
             <div className="flex items-center gap-3">
-              <Button onClick={() => setReadSpeed('slow')} className={cn("rounded-full cursor-pointer px-5", readSpeed === 'slow' ? 'bg-zinc-100' : 'bg-zinc-500')}>Slow</Button>
-              <Button onClick={() => setReadSpeed('average')} className={cn("rounded-full cursor-pointer px-5", readSpeed === 'average' ? 'bg-zinc-100' : 'bg-zinc-500')}>Average</Button>
-              <Button onClick={() => setReadSpeed('fast')} className={cn("rounded-full cursor-pointer px-5", readSpeed === 'fast' ? 'bg-zinc-100' : 'bg-zinc-500')}>Fast</Button>
-              <Button onClick={() => setReadSpeed('custom')} className={cn("rounded-full cursor-pointer px-5", readSpeed === 'custom' ? 'bg-zinc-100' : 'bg-zinc-500')}>Custom</Button>
+              <Button onClick={() => setReadSpeed('slow')} className={cn("rounded-full cursor-pointer px-5", readSpeed === 'slow' ? 'bg-zinc-100' : 'bg-zinc-400')}>Slow</Button>
+              <Button onClick={() => setReadSpeed('average')} className={cn("rounded-full cursor-pointer px-5", readSpeed === 'average' ? 'bg-zinc-100' : 'bg-zinc-400')}>Average</Button>
+              <Button onClick={() => setReadSpeed('fast')} className={cn("rounded-full cursor-pointer px-5", readSpeed === 'fast' ? 'bg-zinc-100' : 'bg-zinc-400')}>Fast</Button>
+              <Button onClick={() => setReadSpeed('custom')} className={cn("rounded-full cursor-pointer px-5", readSpeed === 'custom' ? 'bg-zinc-100' : 'bg-zinc-400')}>Custom</Button>
             </div>
           </div>
 
