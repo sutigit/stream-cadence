@@ -20,23 +20,38 @@ export default function Home() {
 
     async function onSubmit(e: React.FormEvent) {
         e.preventDefault();
-        if (!input.trim()) return;
+        const text = input.trim();
+        if (!text) return;
 
         setInput("");
+        setCompletion("");
         setLoading(true);
 
         try {
+            const res = await fetchResponse(text);
+            if (!res?.body) throw new Error("No response body");
 
-            const res = await fetchResponse(input)
-
-            const dec = new TextDecoder()
-            const reader = res.body!.getReader()
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder();
+            let sysText = "";
 
             while (true) {
-                const { value, done } = await reader.read()
-                if (done) return
+                const { value, done } = await reader.read();
+                if (done) break;
 
-                setCompletion(prev => prev + dec.decode(value))
+                // { stream: true }buffers incomplete sequences
+                const chunk = decoder.decode(value, { stream: true });
+                if (chunk) {
+                    sysText += chunk;
+                    setCompletion(prev => prev + chunk);
+                }
+            }
+
+            // flush decoder to avoid losing last character(s)
+            const tail = decoder.decode();
+            if (tail) {
+                sysText += tail;
+                setCompletion(prev => prev + tail);
             }
 
         } finally {
