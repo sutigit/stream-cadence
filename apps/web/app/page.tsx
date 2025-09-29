@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import ChatInput from "../components/chat-input";
-import { streamCadence } from "./api/openai/utils";
+import { cadenceLLM, useStreamCadence } from "./utils/utils";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
@@ -10,16 +10,15 @@ import { Copy, Glasses, Rabbit, Settings2 } from "lucide-react";
 
 import "./cadence.css"
 import { cn } from "@/lib/utils";
+import { useScroll } from "@/hooks/use-scroll";
 
-type Seg = { id: string; text: string; anim: "normal" | "short" | "long" | "space" };
 
 export default function Home() {
   const [input, setInput] = useState<string>("");
-  const [segs, setSegs] = useState<Seg[]>([
-    // { id: "init", text: "Hi, to get started, send me a message using the buttons below, or just type anything you'd like.", anim: "normal" },
-  ]);
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { segs, setSegs, appendChunk, lastEmitRef } = useStreamCadence()
+  useScroll(scrollRef, segs)
 
   // timings
   const [tokenDelay, setTokenDelay] = useState<number>(100)
@@ -28,37 +27,8 @@ export default function Home() {
   const [revealAnimation, setRevealAnimation] = useState<number>(500)
   const [readSpeed, setReadSpeed] = useState<string>('fast')
 
-  // cadence tracker
-  const lastEmitRef = useRef<number>(performance.now());
 
-  function appendChunk(chunk: string) {
-    const now = performance.now();
-    const dt = now - lastEmitRef.current;
-    lastEmitRef.current = now;
 
-    const anim: Seg["anim"] = dt >= 1000 ? "long" : dt >= 650 ? "short" : "normal";
-
-    // split into words and spaces so spaces render instantly
-    const parts = chunk.split(/(\s+)/);
-    setSegs(prev => {
-      const next = [...prev];
-      for (const p of parts) {
-        if (!p) continue;
-        if (/^\s+$/.test(p)) {
-          next.push({ id: crypto.randomUUID(), text: p, anim: "space" });
-        } else {
-          next.push({ id: crypto.randomUUID(), text: p, anim });
-        }
-      }
-      return next;
-    });
-  }
-
-  useEffect(() => {
-    queueMicrotask(() => {
-      scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-    });
-  }, [segs])
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -70,7 +40,7 @@ export default function Home() {
     lastEmitRef.current = performance.now();
 
     try {
-      await streamCadence(
+      await cadenceLLM(
         input,
         (chunk) => appendChunk(chunk),
         tokenDelay,
@@ -78,11 +48,6 @@ export default function Home() {
         longPause,
         revealAnimation
       );
-
-      // target dx
-      // streamCadence(setInput, 115, 350, 700, 500) // pass number arguments
-      // streamCadence(setInput, tokenDelay, shortPause, longPause, revelAnimation) // pass number type states
-      // streamCadence(setInput, 'average') // pass enum type 'slow' | 'average' | 'fast'
 
     } finally {
       setLoading(false);

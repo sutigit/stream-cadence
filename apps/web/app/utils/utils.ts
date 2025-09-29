@@ -1,4 +1,6 @@
-async function streamCadence(
+import { useRef, useState } from "react";
+
+async function cadenceLLM(
   message: string,
   onText: (t: string) => void,
   wordMs: number, // pause after each word
@@ -133,4 +135,56 @@ async function streamCadence(
   }
 }
 
-export { streamCadence };
+type Seg = {
+  id: string;
+  text: string;
+  anim: "normal" | "short" | "long" | "space";
+};
+
+function useStreamCadence() {
+  const [segs, setSegs] = useState<Seg[]>([
+    // { id: "init", text: "Init text", anim: "normal" },
+  ]);
+
+  // cadence tracker
+  const lastEmitRef = useRef<number>(performance.now());
+
+  function appendChunk(chunk: string) {
+    const now = performance.now();
+    const dt = now - lastEmitRef.current;
+    lastEmitRef.current = now;
+
+    const anim: Seg["anim"] =
+      dt >= 1000 ? "long" : dt >= 650 ? "short" : "normal";
+
+    // split into words and spaces so spaces render instantly
+    const parts = chunk.split(/(\s+)/);
+    setSegs((prev) => {
+      const next = [...prev];
+      for (const p of parts) {
+        if (!p) continue;
+        if (/^\s+$/.test(p)) {
+          next.push({ id: crypto.randomUUID(), text: p, anim: "space" });
+        } else {
+          next.push({ id: crypto.randomUUID(), text: p, anim });
+        }
+      }
+      return next;
+    });
+  }
+
+  return {
+    segs,
+    setSegs,
+    appendChunk,
+    lastEmitRef,
+  };
+}
+
+// TARGET DX
+//  cadenceLLM(115, 350, 700, 500) // pass number arguments
+//  cadenceLLM('average') // pass enum type 'slow' | 'average' | 'fast'
+// OR
+//  cadenceText(115, 350, 700, 500) // pass number arguments
+//  cadenceText('average') // pass enum type 'slow' | 'average' | 'fast'
+export { cadenceLLM, useStreamCadence };
