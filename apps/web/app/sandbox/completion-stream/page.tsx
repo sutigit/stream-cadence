@@ -11,12 +11,11 @@ import { fetchResponse } from "@/app/api/openai/utils";
 
 export default function Home() {
     const [input, setInput] = useState<string>("");
-    const [texts, setTexts] = useState()
     const [loading, setLoading] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
-    useScroll(scrollRef, texts)
 
     const [completion, setCompletion] = useState<string>("")
+    useScroll(scrollRef, completion)
 
     async function onSubmit(e: React.FormEvent) {
         e.preventDefault();

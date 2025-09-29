@@ -15,10 +15,10 @@ interface Message {
 }
 
 export default function Home() {
-    const [input, setInput] = useState("");
+    const [input, setInput] = useState<string>("");
     const [loading, setLoading] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
-    const [completion, setCompletion] = useState("");
+    const [completion, setCompletion] = useState<string>("");
 
     const scrollRef = useRef<HTMLDivElement>(null);
     useScroll(scrollRef, [messages, completion]);
@@ -28,8 +28,6 @@ export default function Home() {
         const text = input.trim();
         if (!text) return;
 
-        // push user message immediately
-        setMessages(prev => [...prev, { type: "user", content: text }]);
         setInput("");
         setCompletion("");
         setLoading(true);
@@ -78,17 +76,11 @@ export default function Home() {
     return (
         <main className="container mx-auto h-screen max-h-screen min-h-screen flex flex-col">
             <div
-                className="h-2/3 bg-indigo-300/3 p-10 rounded-2xl flex-col gap-16 my-10 overflow-y-scroll whitespace-pre-wrap pr-8 scroll-bar"
+                className="h-2/3 bg-indigo-300/3 p-10 rounded-2xl flex-col gap-20 my-10 overflow-y-scroll whitespace-pre-wrap pr-8 scroll-bar"
                 ref={scrollRef}
             >
                 {messages.map((m, idx) => (
-                    <p
-                        key={idx}
-                        className={cn(
-                            "text-xl leading-9",
-                            m.type === "user" && "text-indigo-400 text-right"
-                        )}
-                    >
+                    <p key={idx} className="text-xl leading-9">
                         {m.content}
                     </p>
                 ))}
