@@ -32,7 +32,8 @@ export default function Home() {
 
 
     return (
-        <main className="container mx-auto h-screen max-h-screen min-h-screen flex">
+        <main className="container mx-auto h-screen max-h-screen min-h-screen flex flex-col">
+            <h1 className="px-20 pt-5 text-xl text-red-300 text-center w-full">text-stream</h1>
             <section className="px-20 flex-2 h-full flex flex-col justify-center items-center">
                 <div
                     className="w-full flex mb-20 overflow-y-scroll h-[9rem] whitespace-pre-wrap pr-8 scroll-bar"
@@ -42,7 +43,6 @@ export default function Home() {
                         Hello
                     </p>
                 </div>
-                <ChatInput onSubmit={onSubmit} input={input} setInput={setInput} />
             </section>
         </main>
     );
