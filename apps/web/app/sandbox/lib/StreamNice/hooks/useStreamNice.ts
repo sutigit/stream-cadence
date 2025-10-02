@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { GatedBuffer } from "../GatedBuffer";
-import { Seg } from "../types";
+import { End, Seg } from "../types";
 
 const _sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -11,7 +11,7 @@ export function useStreamNice() {
 
   async function streamReader(
     reader: ReadableStreamDefaultReader<Uint8Array<ArrayBuffer>>,
-    callback: (next: Seg) => void
+    callback: (next: Seg, end: End) => void
   ) {
     const dec = new TextDecoder();
 
@@ -69,13 +69,17 @@ export function useStreamNice() {
     const HALF_PAUSE = 350; // after , ; :
     const FULL_PAUSE = 720; // after . ? !
 
+    let fullText = "";
+
     const consume = async () => {
       let pendingPause: number | null = null;
       buf.release(1); // prime once
+
       for await (const tok of buf) {
         const duration = isSpace(tok)
           ? (pendingPause ?? 0)
           : CHAR_MS * tok.length;
+
         pendingPause = !isSpace(tok)
           ? endsFull(tok)
             ? FULL_PAUSE
@@ -83,11 +87,23 @@ export function useStreamNice() {
               ? HALF_PAUSE
               : null
           : null;
-        // setSegs(prev => [...prev, { content: tok, duration }]);
-        callback({ content: tok, duration });
+
+        fullText += tok;
+
+        callback(
+          { content: tok, duration },
+          { done: false, content: "", error: "" }
+        );
+
         await _sleep(duration);
         buf.release(1);
       }
+
+      // done
+      callback(
+        { content: "", duration: 0 },
+        { done: true, content: fullText, error: "" }
+      );
     };
 
     // run producer and consumer
