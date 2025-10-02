@@ -8,46 +8,40 @@ import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Copy, Glasses, Rabbit, Settings2 } from "lucide-react";
 
-import "./cadence.css"
 import { cn } from "@/lib/utils";
 import { useScroll } from "@/hooks/use-scroll";
+import { fetchResponse } from "./api/openai/utils";
 
 
 export default function Home() {
   const [input, setInput] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { segs, setSegs, appendChunk, lastEmitRef } = useStreamCadence()
-  useScroll(scrollRef, segs)
 
   // timings
-  const [tokenDelay, setTokenDelay] = useState<number>(100)
+  const [charsPerSec, setCharsPerSec] = useState<number>(20)
   const [shortPause, setShortPause] = useState<number>(300)
   const [longPause, setLongPause] = useState<number>(800)
-  const [revealAnimation, setRevealAnimation] = useState<number>(500)
   const [readSpeed, setReadSpeed] = useState<string>('fast')
 
-
-
+  // const { streamReader, segs, setSegs } = useStreamNice(options)
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!input.trim()) return;
 
-    setSegs([]);
     setInput("");
     setLoading(true);
-    lastEmitRef.current = performance.now();
+
+    const res = await fetchResponse(input);
+    if (!res?.body) throw new Error("No response body");
+    const reader = res.body.getReader();
+
+    // await streamReader(reader, (next) => {
+    //      setSegs(prev => [...prev, next]);
+    // })
 
     try {
-      await cadenceLLM(
-        input,
-        (chunk) => appendChunk(chunk),
-        tokenDelay,
-        shortPause,
-        longPause,
-        revealAnimation
-      );
 
     } finally {
       setLoading(false);
@@ -57,34 +51,12 @@ export default function Home() {
   return (
     <main className="container mx-auto h-screen max-h-screen min-h-screen flex">
       <section className="px-20 flex-2 h-full flex flex-col justify-center items-center">
-        {/* <div className="pb-10 flex items-center gap-3 self-end">
-          <p className="text-sm opacity-50">Ghosting</p>
-          <Switch />
-        </div> */}
         <div
           className="w-full flex mb-20 overflow-y-scroll h-[9rem] whitespace-pre-wrap pr-8 scroll-bar"
           ref={scrollRef}
         >
           <p className="text-xl leading-9">
-            {segs.length === 0 && (loading ? "…" : null)}
-            {segs.map(s =>
-              s.anim === "space" ? (
-                <span key={s.id}>{s.text}</span>
-              ) : (
-                <span
-                  key={s.id}
-                  className={
-                    s.anim === "long"
-                      ? "chunk chunk-long"
-                      : s.anim === "short"
-                        ? "chunk chunk-short"
-                        : "chunk"
-                  }
-                >
-                  {s.text}
-                </span>
-              )
-            )}
+
           </p>
         </div>
         <ChatInput onSubmit={onSubmit} input={input} setInput={setInput} />
@@ -95,7 +67,7 @@ export default function Home() {
 
           <div>
             <p className="mb-4 opacity-50 flex items-center gap-2">
-              Cadence speed
+              Streaming speed
               <Rabbit size={18} />
             </p>
             <div className="flex items-center gap-3">
@@ -112,8 +84,8 @@ export default function Home() {
             </div>
             <div className="flex flex-col gap-7 w-full">
               <div>
-                <p className="opacity-50 mb-3 text-sm">Token delay: {tokenDelay} ms</p>
-                <Slider defaultValue={[tokenDelay]} max={1000} step={1} onValueChange={(values) => setTokenDelay((values[0] ?? 1))} />
+                <p className="opacity-50 mb-3 text-sm">Characters per second: {charsPerSec}</p>
+                <Slider defaultValue={[charsPerSec]} max={100} step={1} onValueChange={(values) => setCharsPerSec((values[0] ?? 1))} />
               </div>
               <div>
                 <p className="opacity-50 mb-3 text-sm">Short pause: {shortPause} ms</p>
@@ -122,10 +94,6 @@ export default function Home() {
               <div>
                 <p className="opacity-50 mb-3 text-sm">Long pause: {longPause} ms</p>
                 <Slider defaultValue={[longPause]} max={1000} step={1} onValueChange={(values) => setLongPause((values[0] ?? 1))} />
-              </div>
-              <div>
-                <p className="opacity-50 mb-3 text-sm">Reveal animation: {revealAnimation} ms</p>
-                <Slider defaultValue={[revealAnimation]} max={1000} step={1} onValueChange={(values) => setRevealAnimation((values[0] ?? 1))} />
               </div>
             </div>
           </div>

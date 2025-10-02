@@ -2,20 +2,65 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import "../../cadence.css"
 import { useScroll } from "@/hooks/use-scroll";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 import { fetchResponse } from "@/app/api/openai/utils";
 
+import { useStreamNice } from "../lib/StreamNice/hooks/useStreamNice";
+import { StreamNice } from "../lib/StreamNice";
+
+const STOPS = {
+    dots: '.',
+    commas: ',',
+    question: '',
+    exclamation: '',
+    end: '',
+    mid: ''
+}
+
+const STREAM = {
+    smooth: 'smooth',
+    word: 'word',
+}
+
+const options = {
+    stream: STREAM.smooth,
+    speed: 20,
+    stops: [
+        {
+            sign: [STOPS.dots],
+            duration: 800,
+        },
+        {
+            sign: [STOPS.commas],
+            duration: 500,
+        },
+    ],
+    highlights: [
+        {
+            sign: ['!bold:'],
+            style: {
+                fontWeight: 'bold',
+                color: 'orange'
+            }
+        },
+        {
+            sign: ['!name:'],
+            style: {
+                fontWeight: 'bold',
+                color: 'pink'
+            }
+        }
+    ]
+}
 
 export default function Home() {
     const [input, setInput] = useState<string>("");
-    const [loading, setLoading] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    const [completion, setCompletion] = useState<string>("")
-    useScroll(scrollRef, completion)
+    const { segs, setSegs, streamReader } = useStreamNice()
+    useScroll(scrollRef, segs)
 
     async function onSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -23,38 +68,19 @@ export default function Home() {
         if (!text) return;
 
         setInput("");
-        setCompletion("");
-        setLoading(true);
+        setSegs([]);
 
         try {
             const res = await fetchResponse(text);
             if (!res?.body) throw new Error("No response body");
-
             const reader = res.body.getReader();
-            const decoder = new TextDecoder();
-            let sysText = "";
 
-            while (true) {
-                const { value, done } = await reader.read();
-                if (done) break;
+            await streamReader(reader, (next) => {
+                setSegs(prev => [...prev, next]);
+            })
 
-                // { stream: true }buffers incomplete sequences
-                const chunk = decoder.decode(value, { stream: true });
-                if (chunk) {
-                    sysText += chunk;
-                    setCompletion(prev => prev + chunk);
-                }
-            }
-
-            // flush decoder to avoid losing last character(s)
-            const tail = decoder.decode();
-            if (tail) {
-                sysText += tail;
-                setCompletion(prev => prev + tail);
-            }
-
-        } finally {
-            setLoading(false);
+        } catch (err) {
+            console.error("📌", err)
         }
     }
 
@@ -65,9 +91,8 @@ export default function Home() {
                 className="h-2/3 bg-indigo-300/3 p-10 rounded-2xl flex my-10 overflow-y-scroll whitespace-pre-wrap pr-8 scroll-bar"
                 ref={scrollRef}
             >
-                <p className="text-xl leading-9">
-                    {completion}
-                </p>
+                <StreamNice segs={segs} className="text-2xl leading-9" />
+
             </div>
             <form onSubmit={onSubmit} className="flex mx-auto gap-5 bg-zinc-800 rounded-3xl py-3 pl-8 pr-3">
                 <input
@@ -87,3 +112,5 @@ export default function Home() {
         </main>
     );
 }
+
+

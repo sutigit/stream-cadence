@@ -6,8 +6,6 @@ export async function POST(req: Request) {
     model: process.env.OPENAI_MODEL!,
     input: message,
     stream: true,
-    temperature: 0.2,
-    instructions: process.env.OPENAI_CHAT_INSTRUCTIONS_1,
   });
 
   const encoder = new TextEncoder();

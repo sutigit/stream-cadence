@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
 
+// STUDY THIIIIS
+
 async function cadenceLLM(
   message: string,
   onText: (t: string) => void,
@@ -11,17 +13,17 @@ async function cadenceLLM(
     signal?: AbortSignal;
   }
 ) {
+  // GETS THE READABLE STREAM ============================
   const res = await fetch("/api/openai/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ message }),
     signal: opts?.signal,
   });
-
-  const ct = res.headers.get("content-type") || "";
   const reader = res.body!.getReader();
-  const dec = new TextDecoder();
+  // ======================================================
 
+  // PROCESSESS WHAT AND HOW? ======================================================
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
   let carry = "";
@@ -44,6 +46,7 @@ async function cadenceLLM(
     }
   };
 
+  // ENTRY: Remember that this loops =>
   const process = async (text: string, final = false) => {
     carry += text;
 
@@ -120,21 +123,25 @@ async function cadenceLLM(
       carry = "";
     }
   };
+  // =====================================================================
 
-  if (!ct.startsWith("text/event-stream")) {
-    try {
-      for (;;) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        await process(dec.decode(value, { stream: true }), false);
-      }
-    } finally {
-      const tail = dec.decode();
-      await process(tail, true);
+  // I DONT KNOW HOW THIS RELATES TO REST YET ============================
+  const dec = new TextDecoder();
+
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      await process(dec.decode(value, { stream: true }), false);
     }
+  } finally {
+    const tail = dec.decode();
+    await process(tail, true);
   }
+  // =====================================================================
 }
 
+// APPENDING PROCEDURE IN FRONTEND =======================================
 type Seg = {
   id: string;
   text: string;
@@ -180,6 +187,7 @@ function useStreamCadence() {
     lastEmitRef,
   };
 }
+// =====================================================================
 
 // TARGET DX
 //  cadenceLLM(115, 350, 700, 500) // pass number arguments
