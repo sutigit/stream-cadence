@@ -75,7 +75,17 @@ export default function Home() {
             if (!res?.body) throw new Error("No response body");
             const reader = res.body.getReader();
 
-            await streamReader(reader, (next) => {
+            await streamReader(reader, (next, end) => {
+                if (end.error) {
+                    console.error("📌 error", end.error)
+                    return
+                }
+
+                if (end.done) {
+                    console.log(end.content)
+                    return
+                }
+
                 setSegs(prev => [...prev, next]);
             })
 

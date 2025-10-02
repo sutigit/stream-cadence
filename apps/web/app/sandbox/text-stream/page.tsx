@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import "../../cadence.css"
 import { useScroll } from "@/hooks/use-scroll";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";

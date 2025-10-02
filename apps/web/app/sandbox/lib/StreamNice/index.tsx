@@ -1,5 +1,5 @@
 import { CadencedTextProps } from "./types"
-import "nice.css"
+import "./nice.css"
 
 
 export const StreamNice: React.FC<CadencedTextProps> = ({ segs, ...rest }) => {
