@@ -44,6 +44,10 @@
   will-change: opacity, filter, clip-path;
 } */
 
+.white-space-pre {
+  white-space: pre;
+}
+
 .cadence-anim {
   display: inline-block;
   white-space: pre;

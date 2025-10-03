@@ -4,7 +4,10 @@ import { End, Seg } from "../types";
 
 const _sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+// TODO: type the props!!
 interface Props {}
+
+// TODO: make stream accomodate customizations!!!
 
 export function useStreamNice() {
   const [segs, setSegs] = useState<Seg[]>([]);
@@ -35,27 +38,35 @@ export function useStreamNice() {
         tail += dec.decode(value, { stream: true });
 
         TOKEN_RE.lastIndex = 0;
+
         let m: RegExpExecArray | null,
           consumed = 0,
           out: string[] = [],
           last: string | undefined;
+
         while ((m = TOKEN_RE.exec(tail)) !== null) {
           last = m[0];
           out.push(last);
           consumed = TOKEN_RE.lastIndex;
         }
+
+        // check tail does not end in whitespace, and last is not purely whitespace.
         if (out.length && !/\s$/.test(tail) && last && !/^\s+$/.test(last)) {
           out.pop();
           consumed -= last.length; // keep partial word
         }
+
         for (const t of out) buf.add(t);
+
         tail = tail.slice(consumed);
       }
+
       if (tail) {
         TOKEN_RE.lastIndex = 0;
         let m: RegExpExecArray | null;
         while ((m = TOKEN_RE.exec(tail)) !== null) buf.add(m[0]);
       }
+
       buf.close();
       reader.releaseLock();
     };
