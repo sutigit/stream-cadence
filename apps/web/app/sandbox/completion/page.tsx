@@ -11,7 +11,7 @@ import { useStreamNice } from "../lib/StreamNice/hooks/useStreamNice";
 import { StreamNice } from "../lib/StreamNice";
 import { STOPS, STREAM } from "../lib/StreamNice/enums";
 import { RegPrefix, RegWrap } from "../lib/StreamNice/utils";
-import { StreamConfig } from "../lib/StreamNice/types";
+import { InStreamComponent, InStreamComponents, StreamConfig } from "../lib/StreamNice/types";
 
 const config: StreamConfig = {
     stream: STREAM.smooth,
@@ -26,7 +26,7 @@ const config: StreamConfig = {
             duration: 750,
         },
     ],
-    match: [
+    styled: [
         {
             target: [RegPrefix("!npm:")],
             style: {
@@ -35,13 +35,22 @@ const config: StreamConfig = {
             },
         },
     ],
-    interactions: [
+    components: [
         {
-            target: [RegWrap("link:[", "]")],
-            component: (match) => <span>{match}</span>
+            target: [RegWrap("!link:[", "]")],
+            id: 'my-link'
         },
     ],
     debug: false,
+};
+
+
+const MyLink = ({ id, match }: InStreamComponent) => (
+    <span>{match}</span>
+);
+
+const components: InStreamComponents = {
+    "my-link": MyLink,
 };
 
 export default function Home() {
@@ -90,7 +99,7 @@ export default function Home() {
                 className="h-2/3 bg-indigo-300/3 p-10 rounded-2xl flex my-10 overflow-y-scroll whitespace-pre-wrap pr-8 scroll-bar"
                 ref={scrollRef}
             >
-                <StreamNice segs={segs} className="text-2xl leading-9" />
+                <StreamNice segs={segs} inStream={components} className="text-2xl leading-9" />
 
             </div>
             <form onSubmit={onSubmit} className="flex mx-auto gap-5 bg-zinc-800 rounded-3xl py-3 pl-8 pr-3">

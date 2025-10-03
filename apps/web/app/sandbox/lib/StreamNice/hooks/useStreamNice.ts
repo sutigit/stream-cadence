@@ -3,6 +3,7 @@ import { End, Seg, StreamConfig } from "../types";
 import { _sleep } from "../_/_utils";
 import { _GatedBuffer } from "../_/_gatedBuffer";
 import { defaults } from "../defaults/config";
+import { TOKEN_RE, ONLY_WS, TRAILING_WS } from "../_/_regex";
 
 // TODO: make stream accomodate customizations!!!
 
@@ -14,19 +15,9 @@ export function useStreamNice(config: StreamConfig = defaults) {
     callback: (next: Seg, end: End) => void
   ) {
     const dec = new TextDecoder();
-
     const buf = new _GatedBuffer();
 
-    // --- tokenization helpers ---
-    const NEWLINE = /\r?\n/; // line breaks
-    const SPACES = /[^\S\r\n]+/; // spaces/tabs, not newlines
-    const NONSP = /[^\s]+/; // words/punct
-    const TOKEN_RE = new RegExp(
-      `(${NEWLINE.source}|${SPACES.source}|${NONSP.source})`,
-      "g" // global glag: each call continues from the last match position
-    );
-
-    const pump = async () => {
+    const produce = async () => {
       let tail = "";
       while (true) {
         const { value, done } = await reader.read();
@@ -34,13 +25,13 @@ export function useStreamNice(config: StreamConfig = defaults) {
 
         tail += dec.decode(value, { stream: true });
 
-        // resets the regex’s global internal position pointer
-        TOKEN_RE.lastIndex = 0;
-
         let m: RegExpExecArray | null;
         let consumed = 0;
         let out: string[] = [];
         let last: string | undefined;
+
+        // resets the regex’s global internal position pointer
+        TOKEN_RE.lastIndex = 0;
 
         while ((m = TOKEN_RE.exec(tail)) !== null) {
           last = m[0];
@@ -48,8 +39,14 @@ export function useStreamNice(config: StreamConfig = defaults) {
           consumed = TOKEN_RE.lastIndex;
         }
 
-        // check tail does not end in whitespace, and last is not purely whitespace.
-        if (out.length && !/\s$/.test(tail) && last && !/^\s+$/.test(last)) {
+        if (
+          // check tail does not end in whitespace,
+          out.length &&
+          !TRAILING_WS.test(tail) &&
+          // and last is not purely whitespace.
+          last &&
+          !ONLY_WS.test(last)
+        ) {
           out.pop();
           consumed -= last.length; // keep partial word
         }
@@ -70,11 +67,10 @@ export function useStreamNice(config: StreamConfig = defaults) {
     };
 
     // --- pacing helpers ---
-    const isSpace = (s: string) => /^\s+$/.test(s);
+    const ws = (s: string) => ONLY_WS.test(s);
     const endsFull = (s: string) => /[.!?]$/.test(s);
     const endsHalf = (s: string) => /[,;:]$/.test(s);
 
-    const CHAR_MS = 50; // per visible char
     const HALF_PAUSE = 350; // after , ; :
     const FULL_PAUSE = 720; // after . ? !
 
@@ -85,11 +81,11 @@ export function useStreamNice(config: StreamConfig = defaults) {
       buf.release(1); // prime once
 
       for await (const tok of buf) {
-        const duration = isSpace(tok)
+        const duration = ws(tok)
           ? (pendingPause ?? 0)
-          : CHAR_MS * tok.length;
+          : (config.speed ?? 0) * tok.length;
 
-        pendingPause = !isSpace(tok)
+        pendingPause = !ws(tok)
           ? endsFull(tok)
             ? FULL_PAUSE
             : endsHalf(tok)
@@ -115,8 +111,7 @@ export function useStreamNice(config: StreamConfig = defaults) {
       );
     };
 
-    // run producer and consumer
-    pump();
+    produce();
     consume();
   }
 

@@ -3,7 +3,7 @@ import "./nice.css"
 
 // TODO: we need to collapse old spans to text!!!
 
-export const StreamNice: React.FC<CadencedTextProps> = ({ segs, ...rest }) => {
+export const StreamNice: React.FC<CadencedTextProps> = ({ segs, inStream, ...rest }) => {
     return (
         <p className="white-space-pre" {...rest}>
             {segs.map((s, i) => (
