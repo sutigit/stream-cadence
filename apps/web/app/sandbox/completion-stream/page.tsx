@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { useScroll } from "@/hooks/use-scroll";
 import { Button } from "@/components/ui/button";
@@ -9,57 +9,46 @@ import { fetchResponse } from "@/app/api/openai/utils";
 
 import { useStreamNice } from "../lib/StreamNice/hooks/useStreamNice";
 import { StreamNice } from "../lib/StreamNice";
+import { STOPS, STREAM } from "../lib/StreamNice/enums";
+import { RegPrefix, RegWrap } from "../lib/StreamNice/utils";
+import { StreamConfig } from "../lib/StreamNice/types";
 
-const STOPS = {
-    dots: '.',
-    commas: ',',
-    question: '',
-    exclamation: '',
-    end: '',
-    mid: ''
-}
-
-const STREAM = {
-    smooth: 'smooth',
-    word: 'word',
-}
-
-const options = {
+const config: StreamConfig = {
     stream: STREAM.smooth,
     speed: 20,
     stops: [
         {
-            sign: [STOPS.dots],
-            duration: 800,
+            sign: [STOPS.mid],
+            duration: 400,
         },
         {
-            sign: [STOPS.commas],
-            duration: 500,
+            sign: [STOPS.end],
+            duration: 750,
         },
     ],
-    highlights: [
+    match: [
         {
-            sign: ['!bold:'],
+            target: [RegPrefix("!npm:")],
             style: {
-                fontWeight: 'bold',
-                color: 'orange'
-            }
+                fontWeight: "bold",
+                color: "orange",
+            },
         },
+    ],
+    interactions: [
         {
-            sign: ['!name:'],
-            style: {
-                fontWeight: 'bold',
-                color: 'pink'
-            }
-        }
-    ]
-}
+            target: [RegWrap("link:[", "]")],
+            component: (match) => <span>{match}</span>
+        },
+    ],
+    debug: false,
+};
 
 export default function Home() {
     const [input, setInput] = useState<string>("");
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    const { segs, setSegs, streamReader } = useStreamNice()
+    const { segs, setSegs, streamReader } = useStreamNice(config)
     useScroll(scrollRef, segs)
 
     async function onSubmit(e: React.FormEvent) {
@@ -90,7 +79,7 @@ export default function Home() {
             })
 
         } catch (err) {
-            console.error("📌", err)
+            console.error(err)
         }
     }
 

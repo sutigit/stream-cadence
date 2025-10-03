@@ -1,6 +1,6 @@
 type Next<T> = { value?: T | null; done: boolean };
 
-export class GatedBuffer implements AsyncIterable<string> {
+export class _GatedBuffer implements AsyncIterable<string> {
   private queue: string[];
   private done: boolean;
   private permits: number;

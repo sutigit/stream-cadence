@@ -1,15 +1,12 @@
 import { useState } from "react";
-import { GatedBuffer } from "../GatedBuffer";
-import { End, Seg } from "../types";
-
-const _sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-// TODO: type the props!!
-interface Props {}
+import { End, Seg, StreamConfig } from "../types";
+import { _sleep } from "../_/_utils";
+import { _GatedBuffer } from "../_/_gatedBuffer";
+import { defaults } from "../defaults/config";
 
 // TODO: make stream accomodate customizations!!!
 
-export function useStreamNice() {
+export function useStreamNice(config: StreamConfig = defaults) {
   const [segs, setSegs] = useState<Seg[]>([]);
 
   async function streamReader(
@@ -18,7 +15,7 @@ export function useStreamNice() {
   ) {
     const dec = new TextDecoder();
 
-    const buf = new GatedBuffer();
+    const buf = new _GatedBuffer();
 
     // --- tokenization helpers ---
     const NEWLINE = /\r?\n/; // line breaks
@@ -26,7 +23,7 @@ export function useStreamNice() {
     const NONSP = /[^\s]+/; // words/punct
     const TOKEN_RE = new RegExp(
       `(${NEWLINE.source}|${SPACES.source}|${NONSP.source})`,
-      "g"
+      "g" // global glag: each call continues from the last match position
     );
 
     const pump = async () => {
@@ -37,12 +34,13 @@ export function useStreamNice() {
 
         tail += dec.decode(value, { stream: true });
 
+        // resets the regex’s global internal position pointer
         TOKEN_RE.lastIndex = 0;
 
-        let m: RegExpExecArray | null,
-          consumed = 0,
-          out: string[] = [],
-          last: string | undefined;
+        let m: RegExpExecArray | null;
+        let consumed = 0;
+        let out: string[] = [];
+        let last: string | undefined;
 
         while ((m = TOKEN_RE.exec(tail)) !== null) {
           last = m[0];
