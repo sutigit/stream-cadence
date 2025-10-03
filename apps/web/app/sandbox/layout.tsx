@@ -16,10 +16,9 @@ export default function SandboxLayout({
     const segments = pathname.split('/').filter(Boolean);
     const last = segments[segments.length - 1] ?? '';
     const allowed = [
-        'text-stream',
-        'completion-stream',
-        'stored-completion-stream',
-        'conversation-stream',
+        'text',
+        'completion',
+        'conversation',
     ];
     const active = allowed.includes(last) ? last : '';
 
@@ -31,31 +30,24 @@ export default function SandboxLayout({
         <main>
             <nav className="flex gap-3 mt-5 w-full flex justify-center">
                 <Button
-                    className={cn(btnBase, active === 'text-stream' ? activeClass : inactiveClass)}
+                    className={cn(btnBase, active === 'text' ? activeClass : inactiveClass)}
                     size="lg"
                 >
-                    <Link href="/sandbox/text-stream">Text</Link>
+                    <Link href="/sandbox/text">Text</Link>
                 </Button>
 
                 <Button
-                    className={cn(btnBase, active === 'completion-stream' ? activeClass : inactiveClass)}
+                    className={cn(btnBase, active === 'completion' ? activeClass : inactiveClass)}
                     size="lg"
                 >
-                    <Link href="/sandbox/completion-stream">Completion</Link>
+                    <Link href="/sandbox/completion">Completion</Link>
                 </Button>
 
                 <Button
-                    className={cn(btnBase, active === 'stored-completion-stream' ? activeClass : inactiveClass)}
+                    className={cn(btnBase, active === 'conversation' ? activeClass : inactiveClass)}
                     size="lg"
                 >
-                    <Link href="/sandbox/stored-completion-stream">Stored Completion</Link>
-                </Button>
-
-                <Button
-                    className={cn(btnBase, active === 'conversation-stream' ? activeClass : inactiveClass)}
-                    size="lg"
-                >
-                    <Link href="/sandbox/conversation-stream">Conversation</Link>
+                    <Link href="/sandbox/conversation">Conversation</Link>
                 </Button>
             </nav>
             {children}
