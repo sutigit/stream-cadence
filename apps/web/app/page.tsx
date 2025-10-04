@@ -11,6 +11,9 @@ import { Copy, Glasses, Rabbit, Settings2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useScroll } from "@/hooks/use-scroll";
 import { fetchResponse } from "./api/openai/utils";
+import { useStreamNice } from "@/lib/StreamNice/hooks/useStreamNice";
+import { StreamConfig } from "@/lib/StreamNice/types";
+import { StreamNice } from "@/lib/StreamNice";
 
 
 export default function Home() {
@@ -19,12 +22,16 @@ export default function Home() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // timings
-  const [charsPerSec, setCharsPerSec] = useState<number>(20)
+  const [charsPerSec, setCharsPerSec] = useState<number>(30)
   const [shortPause, setShortPause] = useState<number>(300)
   const [longPause, setLongPause] = useState<number>(800)
   const [readSpeed, setReadSpeed] = useState<string>('fast')
 
-  // const { streamReader, segs, setSegs } = useStreamNice(options)
+  const options: StreamConfig = {
+    speed: charsPerSec
+  }
+
+  const { streamReader, segs, setSegs } = useStreamNice(options)
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -32,14 +39,15 @@ export default function Home() {
 
     setInput("");
     setLoading(true);
+    setSegs([])
 
     const res = await fetchResponse(input);
     if (!res?.body) throw new Error("No response body");
     const reader = res.body.getReader();
 
-    // await streamReader(reader, (next, done) => {
-    //      setSegs(prev => [...prev, next]);
-    // })
+    await streamReader(reader, (next, done) => {
+      setSegs(prev => [...prev, next]);
+    })
 
     try {
 
@@ -55,9 +63,7 @@ export default function Home() {
           className="w-full flex mb-20 overflow-y-scroll h-[9rem] whitespace-pre-wrap pr-8 scroll-bar"
           ref={scrollRef}
         >
-          <p className="text-xl leading-9">
-
-          </p>
+          <StreamNice segs={segs} className="text-2xl leading-9"></StreamNice>
         </div>
         <ChatInput onSubmit={onSubmit} input={input} setInput={setInput} />
       </section>

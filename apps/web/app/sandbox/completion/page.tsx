@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 import { fetchResponse } from "@/app/api/openai/utils";
 
-import { useStreamNice } from "../../../lib/StreamNice/hooks/useStreamNice";
-import { StreamNice } from "../../../lib/StreamNice";
-import { STOPS, STREAM } from "../../../lib/StreamNice/enums";
-import { RegPrefix, RegWrap } from "../../../lib/StreamNice/utils";
-import { InStreamComponent, InStreamComponents, StreamConfig } from "../../../lib/StreamNice/types";
+import { useStreamNice } from "@/lib/StreamNice/hooks/useStreamNice";
+import { StreamNice } from "@/lib/StreamNice";
+import { STOPS, STREAM } from "@/lib/StreamNice/enums";
+import { RegPrefix, RegWrap } from "@/lib/StreamNice/utils";
+import { InStreamComponent, InStreamComponents, StreamConfig } from "@/lib/StreamNice/types";
 
 const config: StreamConfig = {
     stream: STREAM.smooth,
