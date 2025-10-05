@@ -9,19 +9,6 @@
   --blur-size: 0px;
 }
 
-@keyframes wipe {
-  0% {
-    --position: 0%;
-  }
-  /* 95% {
-    --position: 100%;
-    opacity: 1;
-  } */
-  100% {
-    --position: calc(100% + var(--blur-size));
-  }
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -31,7 +18,14 @@
   }
 }
 
-/* wipe in left→right */
+.stream-smooth {
+  animation:
+    fadeIn 200ms forwards,
+    revealLeft var(--dur) linear forwards;
+  will-change: clip-path, opacity;
+  contain: paint; /* isolate repaints */
+  backface-visibility: hidden; /* promote layer in some engines */
+}
 @keyframes revealLeft {
   from {
     clip-path: inset(0 100% 0 0);
@@ -39,15 +33,6 @@
   to {
     clip-path: inset(0 0 0 0);
   }
-}
-
-.stream-smooth {
-  display: inline-block;
-  opacity: 0;
-  animation:
-    fadeIn 200ms forwards,
-    revealLeft var(--dur) linear forwards;
-  will-change: opacity, filter, clip-path;
 }
 
 /* .stream-smooth {
@@ -75,7 +60,20 @@
     #000 calc(var(--position) - var(--blur-size)),
     #0000 var(--position)
   );
-} */
+} 
+ @keyframes wipe {
+  0% {
+    --position: 0%;
+  }
+  95% {
+    --position: 100%;
+    opacity: 1;
+  } 
+  100% {
+    --position: calc(100% + var(--blur-size));
+  }
+}
+*/
 
 .white-space-pre {
   white-space: pre;
