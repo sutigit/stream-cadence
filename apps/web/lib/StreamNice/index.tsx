@@ -9,7 +9,7 @@ export const StreamNice: React.FC<CadencedTextProps> = ({ segs, inStream, ...res
             {segs.map((s, i) => (
                 <span
                     key={i}
-                    className="cadence-anim"
+                    className="stream-smooth"
                     style={{ ["--dur" as any]: `${s.duration}ms` }}
                 >
                     {s.content}
