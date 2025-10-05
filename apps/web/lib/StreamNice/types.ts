@@ -9,17 +9,17 @@ export type CadencedTextProps = React.HTMLAttributes<HTMLParagraphElement> & {
 };
 
 export interface Stop {
-  sign: RegExp[];
+  signs: RegExp[];
   duration: number;
 }
 
 export interface Style {
-  target: RegExp[];
+  targets: RegExp[];
   style: CSSProperties;
 }
 
 export interface Component {
-  target: RegExp[];
+  targets: RegExp[];
   id: string;
 }
 

@@ -18,17 +18,17 @@ const config: StreamConfig = {
     speed: 20,
     stops: [
         {
-            sign: [STOPS.mid],
+            signs: [STOPS.mid],
             duration: 400,
         },
         {
-            sign: [STOPS.end],
+            signs: [STOPS.end],
             duration: 750,
         },
     ],
     styled: [
         {
-            target: [RegPrefix("!npm:")],
+            targets: [RegPrefix("!npm:")],
             style: {
                 fontWeight: "bold",
                 color: "orange",
@@ -37,7 +37,7 @@ const config: StreamConfig = {
     ],
     components: [
         {
-            target: [RegWrap("!link:[", "]")],
+            targets: [RegWrap("!link:[", "]")],
             id: 'my-link'
         },
     ],

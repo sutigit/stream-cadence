@@ -1,11 +1,16 @@
 import { useState } from "react";
-import { End, Seg, StreamConfig } from "../types";
+import { End, Seg, Stop, StreamConfig } from "../types";
 import { _sleep } from "../_/_utils";
 import { _GatedBuffer } from "../_/_gatedBuffer";
 import { defaults } from "../defaults/config";
 import { TOKEN_RE, ONLY_WS, TRAILING_WS } from "../_/_regex";
 
 // TODO: make stream accomodate customizations!!!
+// - [x] stops
+// - [] streaming style -> smooth | word
+// - [] styled chunks
+// - [] component shunks
+// - [] debug: false/true -> show signs and targets or not
 
 export function useStreamNice(config: StreamConfig = defaults) {
   const [segs, setSegs] = useState<Seg[]>([]);
@@ -17,6 +22,7 @@ export function useStreamNice(config: StreamConfig = defaults) {
     const dec = new TextDecoder();
     const buf = new _GatedBuffer();
 
+    // producer --------------------------------------------------------------
     const produce = async () => {
       let tail = "";
       while (true) {
@@ -62,43 +68,40 @@ export function useStreamNice(config: StreamConfig = defaults) {
         while ((m = TOKEN_RE.exec(tail)) !== null) buf.add(m[0]);
       }
 
+      // done
       buf.close();
       reader.releaseLock();
     };
 
-    // --- pacing helpers ---
-    const ws = (s: string) => ONLY_WS.test(s);
-    const endsFull = (s: string) => /[.!?]$/.test(s);
-    const endsHalf = (s: string) => /[,;:]$/.test(s);
-
-    const HALF_PAUSE = 350; // after , ; :
-    const FULL_PAUSE = 720; // after . ? !
-
+    // consumer ---------------------------------------------------------
     let fullText = "";
 
     const consume = async () => {
-      let pendingPause: number | null = null;
+      let pendingPause: number = 0;
       buf.release(1); // prime once
 
       for await (const tok of buf) {
-        const duration = ws(tok)
-          ? (pendingPause ?? 0)
-          : (config.speed ?? 0) * tok.length;
+        // compute duration for this token
+        const duration = isSpace(tok)
+          ? pendingPause // apply pause on the following whitespace
+          : baseDuration(tok, config.speed);
 
-        pendingPause = !ws(tok)
-          ? endsFull(tok)
-            ? FULL_PAUSE
-            : endsHalf(tok)
-              ? HALF_PAUSE
-              : null
-          : null;
-
+        // emit token
         fullText += tok;
-
         callback(
           { content: tok, duration },
           { done: false, content: "", error: "" }
         );
+
+        // schedule next pause if this token is non-space
+        if (!isSpace(tok)) {
+          const ms = stopDuration(tok, config.stops);
+          // take the larger pause if one already pending (e.g., "?!")
+          pendingPause = Math.max(pendingPause, ms);
+        } else {
+          // pause consumed by whitespace; reset
+          pendingPause = 0;
+        }
 
         await _sleep(duration);
         buf.release(1);
@@ -121,3 +124,17 @@ export function useStreamNice(config: StreamConfig = defaults) {
     streamReader,
   };
 }
+
+// helpers -------------------------------------------------------------------
+const isSpace = (s: string) => ONLY_WS.test(s); // check whitespace
+
+const stopDuration = (tok: string, stops?: Stop[]) => {
+  if (!stops?.length) return 0;
+  let ms = 0;
+  for (const { signs, duration } of stops) {
+    if (signs.some((rx) => rx.test(tok))) ms = Math.max(ms, duration);
+  }
+  return ms; // max pause among matches
+};
+
+const baseDuration = (tok: string, speed = 0) => speed * tok.length;
