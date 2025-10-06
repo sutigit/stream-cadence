@@ -1,11 +1,12 @@
 import client from "../connection";
 
 export async function POST(req: Request) {
-  const { message } = await req.json();
+  const { input, instructions } = await req.json();
   const stream = await client.responses.create({
     model: process.env.OPENAI_MODEL!,
-    input: message,
     stream: true,
+    instructions,
+    input,
   });
 
   const encoder = new TextEncoder();
