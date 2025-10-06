@@ -1,6 +1,12 @@
 import { CSSProperties, FC } from "react";
 
-export type Seg = { content: string; duration: number };
+export type Seg = {
+  content: string;
+  duration: number;
+  styled: CSSProperties | null;
+  component: string | null; // components take precedence ofer styled if they have the same matcher
+};
+
 export type End = { content: string; error: string; done: boolean };
 
 export type CadencedTextProps = React.HTMLAttributes<HTMLParagraphElement> & {

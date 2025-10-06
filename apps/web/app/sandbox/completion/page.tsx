@@ -13,9 +13,11 @@ import { STOPS, STREAM } from "@/lib/StreamNice/enums";
 import { RegPrefix, RegWrap } from "@/lib/StreamNice/utils";
 import { InStreamComponent, InStreamComponents, StreamConfig } from "@/lib/StreamNice/types";
 
+import colors from "tailwindcss/colors"
+
 const config: StreamConfig = {
     stream: STREAM.smooth,
-    speed: 20,
+    speed: 40,
     stops: [
         {
             signs: [STOPS.mid],
@@ -28,10 +30,15 @@ const config: StreamConfig = {
     ],
     styled: [
         {
-            targets: [RegPrefix("!npm:")],
+            targets: [RegPrefix("!important:")],
             style: {
-                fontWeight: "bold",
-                color: "orange",
+                color: colors.pink[300],
+            },
+        },
+        {
+            targets: [RegPrefix("!number:")],
+            style: {
+                color: colors.blue[300],
             },
         },
     ],
@@ -46,7 +53,7 @@ const config: StreamConfig = {
 
 
 const MyLink = ({ id, match }: InStreamComponent) => (
-    <span>{match}</span>
+    <button className="px-2 py-1 rounded bg-amber-200 text-zinc-100">{match}</button>
 );
 
 const components: InStreamComponents = {
@@ -69,7 +76,7 @@ export default function Home() {
         setSegs([]);
 
         try {
-            const res = await fetchResponse(text);
+            const res = await fetchResponse(text, "Everytime you are asked to tell anything, prefix important things in regards of the context, with a prefix: !important: -> e.g. !important:molecules or !important:velocity and !important:acceleration for chaining prefixed words. Everytime prefix numbers with !number: -> e.g. !number:6 or !number:2025");
             if (!res?.body) throw new Error("No response body");
             const reader = res.body.getReader();
 
@@ -99,7 +106,7 @@ export default function Home() {
                 className="h-2/3 bg-indigo-300/3 p-10 rounded-2xl flex my-10 overflow-y-scroll whitespace-pre-wrap pr-8 scroll-bar"
                 ref={scrollRef}
             >
-                <StreamNice segs={segs} inStream={components} className="text-2xl leading-9" />
+                <StreamNice segs={segs} inStream={components} className="text-xl leading-9" />
 
             </div>
             <form onSubmit={onSubmit} className="flex mx-auto gap-5 bg-zinc-800 rounded-3xl py-3 pl-8 pr-3">
