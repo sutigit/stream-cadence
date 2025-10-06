@@ -13,8 +13,7 @@ import { defaults } from "../defaults/config";
 import { TOKEN_RE, ENDS_WITH_BOUNDARY, BOUNDARY_TOKEN } from "../_/_regex";
 
 // TODO: make stream accomodate customizations!!!
-// - [] streaming style -> smooth | word
-// - [] debug: false/true -> show signs and targets or not
+// - [] streaming style -> smooth | word and default
 
 export function useStreamNice(config: StreamConfig = defaults) {
   const [segs, setSegs] = useState<Seg[]>([]);
@@ -115,15 +114,19 @@ export function useStreamNice(config: StreamConfig = defaults) {
         // 1. config: streaming style
 
         // 2. config: components
-        const { componentTok, component } = _extractTokComponent(
+        const { componentTok: initParseTok, component } = _extractTokComponent(
           tok,
           config.components
         );
 
         // 3. config: styled
-        const { styledTok, styled } = _extractTokStyles(tok, config.styled);
+        const { styledTok: finalParseTok, styled } = _extractTokStyles(
+          initParseTok,
+          config.styled
+        );
 
-        parsedTok = componentTok ?? styledTok ?? tok; // toks with components take precedence over styled toks
+        // toks with components take precedence over styled toks
+        parsedTok = config.debug ? tok : (finalParseTok ?? tok);
 
         // compute duration for this token
         const duration = _isSpace(parsedTok)

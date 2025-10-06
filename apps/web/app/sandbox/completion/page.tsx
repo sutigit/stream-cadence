@@ -30,15 +30,9 @@ const config: StreamConfig = {
     ],
     styled: [
         {
-            targets: [RegMatch("on", false)],
+            targets: [RegPrefix("!winter:")],
             style: {
                 color: colors.pink[300],
-            },
-        },
-        {
-            targets: [RegStem("talv", false)],
-            style: {
-                color: colors.blue[300],
             },
         },
     ],
@@ -48,7 +42,7 @@ const config: StreamConfig = {
             id: 'my-link'
         },
     ],
-    debug: false,
+    debug: false
 };
 
 
@@ -76,7 +70,7 @@ export default function Home() {
         setSegs([]);
 
         try {
-            const res = await fetchResponse(text, "Do exactly as said");
+            const res = await fetchResponse(text, 'Prefix all words related to winter, with "!winter:". Example: !winter:snow, !winter:santa !winter:clause');
             if (!res?.body) throw new Error("No response body");
             const reader = res.body.getReader();
 

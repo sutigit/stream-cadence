@@ -7,9 +7,9 @@ import { useEffect } from "react"
 
 export const StreamNice: React.FC<CadencedTextProps> = ({ segs, inStream, ...rest }) => {
 
-    useEffect(() => {
-        console.log("📌 segs", segs[segs.length - 1])
-    }, [segs])
+    // useEffect(() => {
+    //     console.log("📌 segs", segs[segs.length - 1])
+    // }, [segs])
 
     return (
         <p className="white-space-pre" {...rest}>
