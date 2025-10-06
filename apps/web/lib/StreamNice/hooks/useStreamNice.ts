@@ -18,7 +18,6 @@ import {
 // - [x] component chunks
 // - [] debug: false/true -> show signs and targets or not
 // - [x] do not style punctuations -> in the producer, push punctuations separately from words
-// - [] solve regex wrap problem
 // - [x] fix affixes inside (), [], {}
 
 export function useStreamNice(config: StreamConfig = defaults) {
@@ -176,9 +175,37 @@ export function useStreamNice(config: StreamConfig = defaults) {
 }
 
 // helpers -------------------------------------------------------------------
+/**
+ * Utility regex for detecting whitespace-only strings.
+ */
 const isSpace = (s: string) => ONLY_WS.test(s); // check whitespace
+
+/**
+ * Computes a base display or animation duration for a token.
+ *
+ * Duration is proportional to the token length and the given speed.
+ *
+ * @example
+ * baseDuration("hello", 50) // 250
+ *
+ * @param tok - The token text.
+ * @param speed - Duration multiplier per character.
+ * @returns The computed duration in milliseconds.
+ */
 const baseDuration = (tok: string, speed = 0) => speed * tok.length;
 
+/**
+ * Calculates a pause (stop) duration for a given token based on stop markers.
+ *
+ * If multiple markers match, the longest duration is used.
+ *
+ * @example
+ * getStopDuration(".", [{ signs: [/\.|!/], duration: 300 }]) // 300
+ *
+ * @param tok - The token text to test.
+ * @param stops - Optional array of stop definitions `{ signs, duration }`.
+ * @returns The maximum matching stop duration in milliseconds, or 0 if none.
+ */
 const getStopDuration = (tok: string, stops?: Stop[]) => {
   if (!stops?.length) return 0;
   let ms = 0;
@@ -189,42 +216,73 @@ const getStopDuration = (tok: string, stops?: Stop[]) => {
   return ms; // max pause among matches
 };
 
+/**
+ * Extracts a styled token and its associated CSS style definition.
+ *
+ * Iterates through all defined style matchers, returning the first match found.
+ * If a regex uses an affix (prefix/suffix), it is removed from the returned token.
+ *
+ * @example
+ * extractTokStyles("!bold:text", [
+ *   { targets: [RegPrefix("!bold:")], style: { fontWeight: "bold" } }
+ * ])
+ * // → { styledTok: "text", styled: { fontWeight: "bold" } }
+ *
+ * @param tok - The token text.
+ * @param styles - Optional array of style matchers.
+ * @returns The processed token and its style, or the original token if none matched.
+ */
 const extractTokStyles = (
   tok: string,
   styles?: Style[]
-): { styledTok: string | null; styled: CSSProperties | null } => {
+): { styledTok: string; styled: CSSProperties | null } => {
   if (!styles?.length) return { styledTok: tok, styled: null };
 
-  let styledTok: string | null = null;
-  let lastStyle: CSSProperties | null = null;
-
   for (const { targets, style } of styles) {
-    targets.forEach((rx) => {
-      if (rx.test(tok)) {
-        styledTok = tok.replace(rx, ""); // strip the matcher affix
-        lastStyle = style;
-      }
-    });
+    for (const rx of targets) {
+      if (!rx.target.test(tok)) continue;
+
+      const styledTok = rx.type === "match" ? tok : tok.replace(rx.target, ""); // strip affix only
+
+      return { styledTok, styled: style }; // first match wins
+    }
   }
-  return { styledTok, styled: lastStyle }; // return the last style
+
+  return { styledTok: tok, styled: null };
 };
 
+/**
+ * Extracts a component identifier from a token.
+ *
+ * Used when certain tokens represent structured components (e.g., emoji, command, UI element).
+ * If a regex uses an affix (prefix/suffix), that part is stripped before returning.
+ *
+ * @example
+ * extractTokComponent("!btn:Click", [
+ *   { targets: [RegPrefix("!btn:")], id: "button" }
+ * ])
+ * // → { componentTok: "Click", component: "button" }
+ *
+ * @param tok - The token text.
+ * @param components - Optional array of component matchers.
+ * @returns The processed token and its matched component id, or null if none matched.
+ */
 const extractTokComponent = (
   tok: string,
   components?: Component[]
-): { componentTok: string | null; component: string | null } => {
+): { componentTok: string; component: string | null } => {
   if (!components?.length) return { componentTok: tok, component: null };
 
-  let componentTok: string | null = null;
-  let lastComponent: string | null = null;
-
   for (const { targets, id } of components) {
-    targets.forEach((rx) => {
-      if (rx.test(tok)) {
-        componentTok = tok.replace(rx, ""); // strip the matcher affix
-        lastComponent = id;
-      }
-    });
+    for (const rx of targets) {
+      if (!rx.target.test(tok)) continue;
+
+      const componentTok =
+        rx.type === "match" ? tok : tok.replace(rx.target, ""); // strip affix only
+
+      return { componentTok, component: id }; // first match wins
+    }
   }
-  return { componentTok, component: lastComponent }; // return the last component id
+
+  return { componentTok: tok, component: null };
 };

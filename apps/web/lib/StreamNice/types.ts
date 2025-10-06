@@ -14,18 +14,23 @@ export type CadencedTextProps = React.HTMLAttributes<HTMLParagraphElement> & {
   inStream?: InStreamComponents;
 };
 
+export type Target = {
+  target: RegExp;
+  type: "match" | "affix";
+};
+
 export interface Stop {
   signs: RegExp[];
   duration: number;
 }
 
 export interface Style {
-  targets: RegExp[];
+  targets: Target[];
   style: CSSProperties;
 }
 
 export interface Component {
-  targets: RegExp[];
+  targets: Target[];
   id: string;
 }
 

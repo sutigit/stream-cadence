@@ -10,7 +10,7 @@ import { fetchResponse } from "@/app/api/openai/utils";
 import { useStreamNice } from "@/lib/StreamNice/hooks/useStreamNice";
 import { StreamNice } from "@/lib/StreamNice";
 import { STOPS, STREAM } from "@/lib/StreamNice/enums";
-import { RegPrefix, RegWrap } from "@/lib/StreamNice/utils";
+import { RegMatch, RegPrefix, RegStem } from "@/lib/StreamNice/utils";
 import { InStreamComponent, InStreamComponents, StreamConfig } from "@/lib/StreamNice/types";
 
 import colors from "tailwindcss/colors"
@@ -30,21 +30,15 @@ const config: StreamConfig = {
     ],
     styled: [
         {
-            targets: [RegPrefix("!important:")],
+            targets: [RegMatch("on", false)],
             style: {
                 color: colors.pink[300],
-            },
-        },
-        {
-            targets: [RegPrefix("!number:")],
-            style: {
-                color: colors.blue[300],
             },
         },
     ],
     components: [
         {
-            targets: [RegWrap("!link:[", "]")],
+            targets: [RegStem("talv", false)],
             id: 'my-link'
         },
     ],
@@ -76,7 +70,7 @@ export default function Home() {
         setSegs([]);
 
         try {
-            const res = await fetchResponse(text, "Everytime you are asked to tell anything, prefix important things in regards of the context, with a prefix: !important: -> e.g. !important:molecules or !important:velocity and !important:acceleration for chaining prefixed words. Everytime prefix numbers with !number: -> e.g. !number:6 or !number:2025");
+            const res = await fetchResponse(text, "Do exactly as said");
             if (!res?.body) throw new Error("No response body");
             const reader = res.body.getReader();
 
