@@ -35,6 +35,12 @@ const config: StreamConfig = {
                 color: colors.pink[300],
             },
         },
+        {
+            targets: [RegStem("talv", false)],
+            style: {
+                color: colors.blue[300],
+            },
+        },
     ],
     components: [
         {

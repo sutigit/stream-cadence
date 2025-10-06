@@ -13,13 +13,8 @@ import { defaults } from "../defaults/config";
 import { TOKEN_RE, ENDS_WITH_BOUNDARY, BOUNDARY_TOKEN } from "../_/_regex";
 
 // TODO: make stream accomodate customizations!!!
-// - [x] stops
 // - [] streaming style -> smooth | word
-// - [x] styled chunks
-// - [x] component chunks
 // - [] debug: false/true -> show signs and targets or not
-// - [x] do not style punctuations -> in the producer, push punctuations separately from words
-// - [x] fix affixes inside (), [], {}
 
 export function useStreamNice(config: StreamConfig = defaults) {
   const [segs, setSegs] = useState<Seg[]>([]);
@@ -119,14 +114,14 @@ export function useStreamNice(config: StreamConfig = defaults) {
 
         // 1. config: streaming style
 
-        // 2. config: styled
-        const { styledTok, styled } = _extractTokStyles(tok, config.styled);
-
-        // 3. config: components
+        // 2. config: components
         const { componentTok, component } = _extractTokComponent(
           tok,
           config.components
         );
+
+        // 3. config: styled
+        const { styledTok, styled } = _extractTokStyles(tok, config.styled);
 
         parsedTok = componentTok ?? styledTok ?? tok; // toks with components take precedence over styled toks
 
