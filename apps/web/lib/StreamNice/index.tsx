@@ -19,12 +19,12 @@ export const StreamNice: React.FC<CadencedTextProps> = ({ segs, inStream, ...res
     }
 
     return (
-        <div style={{ whiteSpace: 'pre-line' }} {...rest}>
+        <div className="ws-pre-line" {...rest}>
             {segs.map((s, i) => (
                 <div
                     key={i}
-                    className="stream-smooth"
-                    style={{ ["--dur" as any]: `${s.duration}ms`, ...s.styled, display: "inline" }}
+                    className="stream-smooth inline"
+                    style={{ ["--dur" as any]: `${s.duration}ms`, ...s.styled }}
                 >
                     {s.component ? defineComponent(s.component, s.content) : <>{s.content}</>}
                 </div>

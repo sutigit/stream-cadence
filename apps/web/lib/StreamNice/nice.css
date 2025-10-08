@@ -18,6 +18,14 @@
   }
 }
 
+.inline {
+  display: inline;
+}
+
+.ws-pre-line {
+  white-space: pre-line;
+}
+
 .stream-smooth {
   animation:
     fadeIn 200ms forwards,
