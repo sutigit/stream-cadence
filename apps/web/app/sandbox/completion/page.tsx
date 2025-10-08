@@ -28,14 +28,14 @@ const config: StreamConfig = {
             duration: 750,
         },
     ],
-    styled: [
-        {
-            targets: [RegPrefix("!winter:")],
-            style: {
-                color: colors.pink[300],
-            },
-        },
-    ],
+    // styled: [
+    //     {
+    //         targets: [RegPrefix("!winter:")],
+    //         style: {
+    //             color: colors.pink[300],
+    //         },
+    //     },
+    // ],
     components: [
         {
             targets: [RegStem("talv", false)],
@@ -47,7 +47,7 @@ const config: StreamConfig = {
 
 
 const MyLink = ({ id, match }: InStreamComponent) => (
-    <button className="px-2 py-1 rounded bg-amber-200 text-zinc-100">{match}</button>
+    <button onClick={() => console.log("waaau")} className="px-1 cursor-pointer py-0 rounded bg-amber-200 text-zinc-900">{match}</button>
 );
 
 const components: InStreamComponents = {
@@ -70,7 +70,7 @@ export default function Home() {
         setSegs([]);
 
         try {
-            const res = await fetchResponse(text, 'Prefix all words related to winter, with "!winter:". Example: !winter:snow, !winter:santa !winter:clause');
+            const res = await fetchResponse(text, '');
             if (!res?.body) throw new Error("No response body");
             const reader = res.body.getReader();
 
@@ -100,7 +100,7 @@ export default function Home() {
                 className="h-2/3 bg-indigo-300/3 p-10 rounded-2xl flex my-10 overflow-y-scroll whitespace-pre-wrap pr-8 scroll-bar"
                 ref={scrollRef}
             >
-                <StreamNice segs={segs} inStream={components} className="text-xl leading-9" />
+                <StreamNice segs={segs} inStream={components} />
 
             </div>
             <form onSubmit={onSubmit} className="flex mx-auto gap-5 bg-zinc-800 rounded-3xl py-3 pl-8 pr-3">

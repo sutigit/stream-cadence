@@ -3,25 +3,32 @@ import "./nice.css"
 import { useEffect } from "react"
 
 // - [] add markdown parser
-// - [] collapse old spans to one text chunk, keep styled or component spans as they are tho
+// - [x] now accomodate components!!!
+// - [] Performance: collapse old spans to text chunks, keep styled or component spans as they are.
+// 
+
+// ROADMAP THINGS
+// - RegWrap
+// - Streaming by WORDs
 
 export const StreamNice: React.FC<CadencedTextProps> = ({ segs, inStream, ...rest }) => {
 
-    // useEffect(() => {
-    //     console.log("📌 segs", segs[segs.length - 1])
-    // }, [segs])
+    const defineComponent = (componentId: string, target: string) => {
+        const Component = inStream?.[componentId]
+        return Component ? <Component id={componentId} match={target} /> : <div style={{ color: '#E11D48' }}>Invalid {componentId}</div>
+    }
 
     return (
-        <p className="white-space-pre" {...rest}>
+        <div style={{ whiteSpace: 'pre-line' }} {...rest}>
             {segs.map((s, i) => (
-                <span
+                <div
                     key={i}
                     className="stream-smooth"
-                    style={{ ["--dur" as any]: `${s.duration}ms`, ...s.styled }}
+                    style={{ ["--dur" as any]: `${s.duration}ms`, ...s.styled, display: "inline" }}
                 >
-                    {s.content}
-                </span>
+                    {s.component ? defineComponent(s.component, s.content) : <>{s.content}</>}
+                </div>
             ))}
-        </p>
+        </div>
     )
 }

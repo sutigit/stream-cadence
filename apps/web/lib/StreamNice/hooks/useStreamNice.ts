@@ -12,7 +12,7 @@ import { _GatedBuffer } from "../_/_gatedBuffer";
 import { defaults } from "../defaults/config";
 import { TOKEN_RE, ENDS_WITH_BOUNDARY, BOUNDARY_TOKEN } from "../_/_regex";
 
-// TODO: make stream accomodate customizations!!!
+// ROADMAP thing
 // - [] streaming style -> smooth | word and default
 
 export function useStreamNice(config: StreamConfig = defaults) {
@@ -135,8 +135,10 @@ export function useStreamNice(config: StreamConfig = defaults) {
 
         // emit token
         fullText += parsedTok;
+
+        const basic = !styled && !component;
         callback(
-          { content: parsedTok, duration, styled, component },
+          { content: parsedTok, duration, basic, styled, component },
           { done: false, content: "", error: "" }
         );
 
@@ -157,7 +159,13 @@ export function useStreamNice(config: StreamConfig = defaults) {
 
       // done
       callback(
-        { content: "", duration: 0, styled: null, component: null },
+        {
+          content: "",
+          duration: 0,
+          basic: true,
+          styled: null,
+          component: null,
+        },
         { done: true, content: fullText, error: "" }
       );
     };
