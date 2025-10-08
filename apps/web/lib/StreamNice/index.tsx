@@ -1,33 +1,30 @@
-import { CadencedTextProps } from "./types"
+import { StreamNiceProps } from "./types"
 import "./nice.css"
-import { useEffect } from "react"
-
-// - [] add markdown parser
-// - [x] now accomodate components!!!
-// - [] Performance: collapse old spans to text chunks, keep styled or component spans as they are.
-// 
 
 // ROADMAP THINGS
+// - add markdown parser
+// - Performance: collapse old spans to text chunks, keep styled or component spans as they are.
 // - RegWrap
-// - Streaming by WORDs
+// - streaming style -> smooth | word and default
 
-export const StreamNice: React.FC<CadencedTextProps> = ({ segs, inStream, ...rest }) => {
+
+export const StreamNice: React.FC<StreamNiceProps> = ({ segs, inStream, ...rest }) => {
 
     const defineComponent = (componentId: string, target: string) => {
         const Component = inStream?.[componentId]
-        return Component ? <Component id={componentId} match={target} /> : <div style={{ color: '#E11D48' }}>Invalid {componentId}</div>
+        return Component ? <Component id={componentId} match={target} /> : <span style={{ color: '#E11D48' }}>Invalid {componentId}</span>
     }
 
     return (
         <div className="ws-pre-line" {...rest}>
             {segs.map((s, i) => (
-                <div
+                <span
                     key={i}
-                    className="stream-smooth inline"
+                    className="stream-smooth"
                     style={{ ["--dur" as any]: `${s.duration}ms`, ...s.styled }}
                 >
                     {s.component ? defineComponent(s.component, s.content) : <>{s.content}</>}
-                </div>
+                </span>
             ))}
         </div>
     )

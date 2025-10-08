@@ -46,7 +46,7 @@ export interface InStreamComponent {
 
 export type InStreamComponents = Record<string, FC<InStreamComponent>>;
 
-export type CadencedTextProps = React.HTMLAttributes<HTMLDivElement> & {
+export type StreamNiceProps = React.HTMLAttributes<HTMLSpanElement> & {
   segs: Seg[];
   inStream?: InStreamComponents;
 };

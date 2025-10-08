@@ -47,7 +47,8 @@ const config: StreamConfig = {
 
 
 const MyLink = ({ id, match }: InStreamComponent) => (
-    <button onClick={() => console.log("waaau")} className="px-1 cursor-pointer py-0 rounded bg-amber-200 text-zinc-900">{match}</button>
+    // remember in docs to tell people that components need to be inline components like span, buttons or inline classed components
+    <div style={{ display: 'inline' }} onClick={() => console.log(match)} className="px-1 cursor-pointer py-0 rounded-md bg-amber-300 text-zinc-900">{match}</div>
 );
 
 const components: InStreamComponents = {

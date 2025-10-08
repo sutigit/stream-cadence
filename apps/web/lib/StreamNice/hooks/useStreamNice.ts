@@ -12,9 +12,6 @@ import { _GatedBuffer } from "../_/_gatedBuffer";
 import { defaults } from "../defaults/config";
 import { TOKEN_RE, ENDS_WITH_BOUNDARY, BOUNDARY_TOKEN } from "../_/_regex";
 
-// ROADMAP thing
-// - [] streaming style -> smooth | word and default
-
 export function useStreamNice(config: StreamConfig = defaults) {
   const [segs, setSegs] = useState<Seg[]>([]);
 
