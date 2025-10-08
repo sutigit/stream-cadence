@@ -1,5 +1,6 @@
 import { StreamNiceProps } from "./types"
 import "./nice.css"
+import { memo } from "react"
 
 // ROADMAP THINGS
 // - add markdown parser
@@ -8,7 +9,7 @@ import "./nice.css"
 // - streaming style -> smooth | word and default
 
 
-export const StreamNice: React.FC<StreamNiceProps> = ({ segs, inStream, ...rest }) => {
+const StreamNice: React.FC<StreamNiceProps> = ({ segs, inStream, ...rest }) => {
 
     const defineComponent = (componentId: string, target: string) => {
         const Component = inStream?.[componentId]
@@ -29,3 +30,5 @@ export const StreamNice: React.FC<StreamNiceProps> = ({ segs, inStream, ...rest 
         </div>
     )
 }
+
+export default memo(StreamNice)

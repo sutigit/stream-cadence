@@ -8,7 +8,7 @@ import { Send } from "lucide-react";
 import { fetchResponse } from "@/app/api/openai/utils";
 
 import { useStreamNice } from "@/lib/StreamNice/hooks/useStreamNice";
-import { StreamNice } from "@/lib/StreamNice";
+import StreamNice from "@/lib/StreamNice";
 import { STOPS, STREAM } from "@/lib/StreamNice/enums";
 import { RegMatch, RegPrefix, RegStem } from "@/lib/StreamNice/utils";
 import { InStreamComponent, InStreamComponents, StreamConfig } from "@/lib/StreamNice/types";
@@ -38,7 +38,7 @@ const config: StreamConfig = {
     // ],
     components: [
         {
-            targets: [RegStem("talv", false)],
+            targets: [RegStem("sat", false)],
             id: 'my-link'
         },
     ],
