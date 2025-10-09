@@ -8,6 +8,8 @@ export type Seg = {
   component: string | null; // components take precedence ofer styled if they have the same matcher
 };
 
+export type InternalSeg = Omit<Seg, "duration" | "basic">;
+
 export type End = { content: string; error: string; done: boolean };
 
 export type Target = {

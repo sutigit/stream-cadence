@@ -17,7 +17,7 @@ import colors from "tailwindcss/colors"
 
 const config: StreamConfig = {
     stream: STREAM.smooth,
-    speed: 40,
+    speed: 30,
     stops: [
         {
             signs: [STOPS.mid],
@@ -38,7 +38,7 @@ const config: StreamConfig = {
     // ],
     components: [
         {
-            targets: [RegStem("sat", false)],
+            targets: [RegStem("saturn", false)],
             id: 'my-link'
         },
     ],
