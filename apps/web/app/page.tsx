@@ -30,16 +30,16 @@ export default function Home() {
     speed: charsPerSec
   }
 
-  const { streamReader, segs, setSegs } = useStreamNice(options)
+  const { streamReader, next, setNext } = useStreamNice(options)
 
 
   return (
-    <main className="container mx-auto py-20 h-screen max-h-screen min-h-screen">
+    <main className="container mx-auto py-10">
       <div className="mb-10">
         <p className="text-6xl font-bold mb-2">Customize AI message</p>
-        <p className="text-6xl font-bold">streams with ease.</p>
+        <p className="text-6xl font-bold">streams with ease. <span className="text-xl text-indigo-400/80">beta</span></p>
       </div>
-      <div className="w-full h-2/3 grid grid-cols-3 gap-1">
+      <div className="w-full h-[540px] grid grid-cols-3 gap-1">
 
         {/* Chat container --------------------- */}
         <div className="chat-container w-full h-full px-6 py-4 col-span-2 bg-orange-100/80 rounded-2xl grid place-items-center">
