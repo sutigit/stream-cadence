@@ -112,7 +112,8 @@ export function useStreamNice(config: StreamConfig = defaults) {
       for await (const tok of buf) {
         let parsedTok: string = tok; // tok stripped from matcher affixes
 
-        // 1. config: streaming style
+        // 1. config: streaming style -> stream | word
+        // -- in roadmap
 
         // 2. config: components
         const { componentTok: initParseTok, component } = _extractTokComponent(

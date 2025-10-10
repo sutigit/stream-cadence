@@ -68,6 +68,7 @@ export default function Home() {
         if (!text) return;
 
         setInput("");
+        setNext(null)
 
         try {
             const res = await fetchResponse(text, '');

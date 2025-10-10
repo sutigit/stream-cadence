@@ -22,7 +22,7 @@
   white-space: pre-line;
 }
 
-.latest {
+.stream-nice-anim {
   opacity: 0;
   animation:
     fadeIn 200ms forwards,

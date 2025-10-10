@@ -3,8 +3,8 @@ import "./nice.css"
 import { memo, ReactNode, useEffect, useState } from "react"
 
 // - [x] Performance: collapse old spans to text chunks, keep styled or component spans as they are.
-// - [] accomodate styled
-// - [] accomodate component 
+// - [x] accomodate styled
+// - [x] accomodate component 
 // - [X] where the hell did my fadeIn go
 // - [X] use something else than flushSync.... try animationInterval then...
 
@@ -18,35 +18,52 @@ const StreamNice: React.FC<StreamNiceProps> = ({ next, inStream, ...rest }) => {
 
     const defineComponent = (componentId: string, target: string) => {
         const Component = inStream?.[componentId]
-
         return Component ? <Component id={componentId} match={target} /> : <span style={{ color: '#E11D48' }}>Invalid {componentId}</span>
     }
 
     const [old, setOld] = useState<(string | Next)[]>([])
     const [temp, setTemp] = useState<string | Next>("")
-    const [latest, setLatest] = useState<Next | null>(null)
+    const [last, setLast] = useState<Next | null>(null)
 
     const [update, setUpdate] = useState<string>(crypto.randomUUID()) // force update
 
     useEffect(() => {
-        const prev = latest
+        if (!next) {
+            setOld([])
+            setTemp("")
+            setLast(null)
+            return
+        }
+
+        const prev = last
         if (prev) {
-            if (prev.basic) {
-                // accumulate temp segments as long as the chunk is basic text
-                setTemp(temp => temp + prev?.content)
+            if (prev?.basic) {
+                // if basic chunk, accumulate text content to one 
+                // segment untila a none basic chunk appears
+                setTemp(t => t + prev.content as string)
             } else {
-                // when the chunk is styled or component, add the temp segment to the old segments
-                // and set the new styled or component chunk as temp
-                setOld(prevOlds => [...prevOlds, temp])
-                setTemp(prev)
+                // when chunk is not basic, push the segments to old segments
+
+                // 1. copy current old segments
+                const harden: (string | Next)[] = [...old]
+
+                // 2. add the accumulated string temp if any
+                if (temp) harden.push(temp as string)
+
+                // 3. add the lastest none basic chunk
+                harden.push(prev as Next)
+
+                // 4. apply all
+                setOld(harden)
+
+                // 5. reset temp
+                setTemp("")
             }
         }
 
-
-        setLatest(next)
-        setUpdate(crypto.randomUUID()) // force update latest chunk
+        setLast(next)
+        setUpdate(crypto.randomUUID()) // force update last chunk
     }, [next])
-
 
     return (
         <div className="ws-pre-line" {...rest}>
@@ -57,13 +74,13 @@ const StreamNice: React.FC<StreamNiceProps> = ({ next, inStream, ...rest }) => {
                         // if segment is purely text
                         <span key={i} className="old">{old}</span>
                         :
-                        // if segment is a styled text or component
+                        // if segment is a styled or component object
                         <span
                             key={i}
                             className="old"
                             style={{ ...old.styled }}
                         >
-                            {old.component ? "hmmmm" : old.content}
+                            {old.component ? defineComponent(old.component, old.content) : old.content}
                         </span>
                 ))
             }
@@ -74,29 +91,29 @@ const StreamNice: React.FC<StreamNiceProps> = ({ next, inStream, ...rest }) => {
                     // if segment is purely text
                     <span className="temp">{temp}</span>
                     :
-                    // if segment is a styled text or component
+                    // if segment is a styled or component object
                     <span
                         className="temp"
                         style={{ ...temp.styled }}
                     >
-                        {temp.component ? "hmmmm" : temp.content}
+                        {temp.component ? defineComponent(temp.component, temp.content) : temp.content}
                     </span>
             }
 
 
             {
-                /* latest chunk animated ---------------------*/
-                latest &&
+                /* last chunk animated ---------------------*/
+                last &&
                 <span
                     key={update}
-                    className="latest"
-                    style={{ ["--dur" as any]: `${latest.duration}ms` }}
+                    className="last stream-nice-anim"
+                    style={{ ["--dur" as any]: `${last.duration}ms`, ...last.styled }}
                 >
-                    {latest.component ? defineComponent(latest.component, latest.content) : latest.content}
+                    {last.component ? defineComponent(last.component, last.content) : last.content}
                 </span>
             }
         </div>
     )
 }
 
-export default memo(StreamNice)
+export default StreamNice
