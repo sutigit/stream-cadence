@@ -162,7 +162,7 @@ export function useStreamNice(config: StreamConfig = defaults) {
       callback(
         {
           content: "",
-          duration: 0,
+          duration: MIN_PAUSE,
           basic: true,
           styled: null,
           component: null,
