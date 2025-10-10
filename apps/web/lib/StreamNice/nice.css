@@ -22,7 +22,8 @@
   white-space: pre-line;
 }
 
-.stream-smooth {
+.latest {
+  opacity: 0;
   animation:
     fadeIn 200ms forwards,
     revealLeft var(--dur) linear forwards;
@@ -30,6 +31,7 @@
   contain: paint; /* isolate repaints */
   backface-visibility: hidden; /* promote layer in some engines */
 }
+
 @keyframes revealLeft {
   from {
     clip-path: inset(0 100% 0 0);

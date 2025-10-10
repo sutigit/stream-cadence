@@ -17,7 +17,7 @@ import colors from "tailwindcss/colors"
 
 const config: StreamConfig = {
     stream: STREAM.smooth,
-    speed: 30,
+    speed: 50,
     stops: [
         {
             signs: [STOPS.mid],
@@ -77,6 +77,9 @@ export default function Home() {
             await streamReader(reader, (value, end) => {
                 if (end.error) throw new Error(end.error)
                 if (end.done) return
+
+                // Remember to add into the docs that this uses 
+                // flushSync and should not be used in react lifecycle methods
                 setNext(value);
             })
 
@@ -93,7 +96,6 @@ export default function Home() {
                 ref={scrollRef}
             >
                 <StreamNice next={next} inStream={components} />
-
             </div>
             <form onSubmit={onSubmit} className="flex mx-auto gap-5 bg-zinc-800 rounded-3xl py-3 pl-8 pr-3">
                 <input

@@ -22,7 +22,7 @@ export interface Stop {
   duration: number;
 }
 
-export interface Style {
+export interface Styled {
   targets: Target[];
   style: CSSProperties;
 }
@@ -36,7 +36,7 @@ export interface StreamConfig {
   stream?: "smooth" | "word";
   speed?: number;
   stops?: Stop[];
-  styled?: Style[];
+  styled?: Styled[];
   components?: Component[];
   debug?: boolean;
 }
