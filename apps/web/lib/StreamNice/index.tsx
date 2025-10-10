@@ -1,4 +1,4 @@
-import { InternalSeg, Seg, StreamNiceProps } from "./types"
+import { InternalSeg, Next, StreamNiceProps } from "./types"
 import "./nice.css"
 import { memo, useEffect, useState } from "react"
 
@@ -10,32 +10,25 @@ import { memo, useEffect, useState } from "react"
 // - streaming style -> smooth | word and default
 
 
-const StreamNice: React.FC<StreamNiceProps> = ({ segs, inStream, ...rest }) => {
+const StreamNice: React.FC<StreamNiceProps> = ({ next, inStream, ...rest }) => {
 
     const defineComponent = (componentId: string, target: string) => {
         const Component = inStream?.[componentId]
         return Component ? <Component id={componentId} match={target} /> : <span style={{ color: '#E11D48' }}>Invalid {componentId}</span>
     }
 
-    const [oldSegs, setOldSegs] = useState<Seg[]>([])
-    const [freshSeg, setFreshSeg] = useState<Seg>()
+    const [oldSegs, setOldSegs] = useState<Next[]>([])
+    const [freshSeg, setFreshSeg] = useState<Next | null>(null)
 
-    const [freshSegUpdate, setFreshSegUpdate] = useState<string>(crypto.randomUUID())
+    const [update, setUpdate] = useState<string>(crypto.randomUUID()) // force update
 
     useEffect(() => {
-        const latest = segs[segs.length - 1]
-        const prev = segs[segs.length - 2] ?? null
-
-        // what a weird bug, the fifth seg already has 6 items that messess this up.
-        console.log("📌 latest:", latest?.content)
-        console.log("📌 prev:", prev?.content)
-        console.log("📌 segs", segs)
-
+        const prev = freshSeg
         if (prev) setOldSegs(old => [...old, prev])
 
-        setFreshSeg(latest)
-        setFreshSegUpdate(crypto.randomUUID())
-    }, [segs])
+        setFreshSeg(next)
+        setUpdate(crypto.randomUUID())
+    }, [next])
 
 
     return (
@@ -51,7 +44,7 @@ const StreamNice: React.FC<StreamNiceProps> = ({ segs, inStream, ...rest }) => {
             {
                 freshSeg ?
                     <span
-                        key={freshSegUpdate}
+                        key={update}
                         className="stream-smooth"
                         style={{ ["--dur" as any]: `${freshSeg.duration}ms`, ...freshSeg.styled }}
                     >

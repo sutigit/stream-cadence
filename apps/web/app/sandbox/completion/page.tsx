@@ -59,8 +59,8 @@ export default function Home() {
     const [input, setInput] = useState<string>("");
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    const { segs, setSegs, streamReader } = useStreamNice(config)
-    useScroll(scrollRef, segs)
+    const { next, setNext, streamReader } = useStreamNice(config)
+    useScroll(scrollRef, next)
 
     async function onSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -68,25 +68,16 @@ export default function Home() {
         if (!text) return;
 
         setInput("");
-        setSegs([]);
 
         try {
             const res = await fetchResponse(text, '');
             if (!res?.body) throw new Error("No response body");
             const reader = res.body.getReader();
 
-            await streamReader(reader, (next, end) => {
-                if (end.error) {
-                    console.error("📌 error", end.error)
-                    return
-                }
-
-                if (end.done) {
-                    console.log(end.content)
-                    return
-                }
-
-                setSegs(prev => [...prev, next]);
+            await streamReader(reader, (value, end) => {
+                if (end.error) throw new Error(end.error)
+                if (end.done) return
+                setNext(value);
             })
 
         } catch (err) {
@@ -101,7 +92,7 @@ export default function Home() {
                 className="h-2/3 bg-indigo-300/3 p-10 rounded-2xl flex my-10 overflow-y-scroll whitespace-pre-wrap pr-8 scroll-bar"
                 ref={scrollRef}
             >
-                <StreamNice segs={segs} inStream={components} />
+                <StreamNice next={next} inStream={components} />
 
             </div>
             <form onSubmit={onSubmit} className="flex mx-auto gap-5 bg-zinc-800 rounded-3xl py-3 pl-8 pr-3">

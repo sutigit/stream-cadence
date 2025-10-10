@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { End, Seg, StreamConfig } from "../types";
+import { End, Next, StreamConfig } from "../types";
 import {
   _baseDuration,
   _extractTokComponent,
@@ -11,13 +10,14 @@ import {
 import { _GatedBuffer } from "../_/_gatedBuffer";
 import { defaults } from "../defaults/config";
 import { TOKEN_RE, ENDS_WITH_BOUNDARY, BOUNDARY_TOKEN } from "../_/_regex";
+import { useFlushedState } from "./useFlushedState";
 
 export function useStreamNice(config: StreamConfig = defaults) {
-  const [segs, setSegs] = useState<Seg[]>([]);
+  const [next, setNext] = useFlushedState<Next | null>(null);
 
   async function streamReader(
     reader: ReadableStreamDefaultReader<Uint8Array<ArrayBuffer>>,
-    callback: (next: Seg, end: End) => void
+    callback: (next: Next, end: End) => void
   ) {
     const dec = new TextDecoder();
     const buf = new _GatedBuffer();
@@ -172,8 +172,8 @@ export function useStreamNice(config: StreamConfig = defaults) {
   }
 
   return {
-    segs,
-    setSegs,
+    next,
+    setNext,
     streamReader,
   };
 }

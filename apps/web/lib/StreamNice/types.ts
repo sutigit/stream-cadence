@@ -1,6 +1,6 @@
 import { CSSProperties, FC } from "react";
 
-export type Seg = {
+export type Next = {
   content: string;
   duration: number;
   basic: boolean;
@@ -8,7 +8,7 @@ export type Seg = {
   component: string | null; // components take precedence ofer styled if they have the same matcher
 };
 
-export type InternalSeg = Omit<Seg, "duration" | "basic">;
+export type InternalSeg = Omit<Next, "duration" | "basic">;
 
 export type End = { content: string; error: string; done: boolean };
 
@@ -49,6 +49,6 @@ export interface InStreamComponent {
 export type InStreamComponents = Record<string, FC<InStreamComponent>>;
 
 export type StreamNiceProps = React.HTMLAttributes<HTMLSpanElement> & {
-  segs: Seg[];
+  next: Next | null;
   inStream?: InStreamComponents;
 };
