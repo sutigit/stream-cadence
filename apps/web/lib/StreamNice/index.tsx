@@ -6,6 +6,7 @@ import { memo, ReactNode, useEffect, useState } from "react"
 // - [] accomodate styled
 // - [] accomodate component 
 // - [] where the hell did my fadeIn go
+// - [] use something else than flushSync.... try animationInterval then...
 
 // ROADMAP THINGS
 // - add markdown parser
