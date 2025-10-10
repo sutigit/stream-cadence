@@ -10,10 +10,14 @@ import {
 import { _GatedBuffer } from "../_/_gatedBuffer";
 import { defaults } from "../defaults/config";
 import { TOKEN_RE, ENDS_WITH_BOUNDARY, BOUNDARY_TOKEN } from "../_/_regex";
-import { useFlushedState } from "./useFlushedState";
+import { useState } from "react";
+
+// Never make it be zero to avoid react state batching problems.
+// Increase if skipped useEffect problems occurs
+const MIN_PAUSE = 1; // ms.
 
 export function useStreamNice(config: StreamConfig = defaults) {
-  const [next, setNext] = useFlushedState<Next | null>(null);
+  const [next, setNext] = useState<Next | null>(null);
 
   async function streamReader(
     reader: ReadableStreamDefaultReader<Uint8Array<ArrayBuffer>>,
@@ -101,7 +105,7 @@ export function useStreamNice(config: StreamConfig = defaults) {
     let fullText = "";
 
     const consume = async () => {
-      let pendingPause: number = 0;
+      let pendingPause: number = MIN_PAUSE;
 
       buf.release(1); // initial buffer release
 
@@ -147,7 +151,7 @@ export function useStreamNice(config: StreamConfig = defaults) {
           pendingPause = Math.max(pendingPause, ms);
         } else {
           // pause consumed by whitespace; reset
-          pendingPause = 0;
+          pendingPause = MIN_PAUSE;
         }
 
         await _sleep(duration);

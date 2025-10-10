@@ -17,7 +17,7 @@ import colors from "tailwindcss/colors"
 
 const config: StreamConfig = {
     stream: STREAM.smooth,
-    speed: 50,
+    speed: 30,
     stops: [
         {
             signs: [STOPS.mid],
@@ -77,9 +77,6 @@ export default function Home() {
             await streamReader(reader, (value, end) => {
                 if (end.error) throw new Error(end.error)
                 if (end.done) return
-
-                // Remember to add into the docs that this uses 
-                // flushSync and should not be used in react lifecycle methods
                 setNext(value);
             })
 

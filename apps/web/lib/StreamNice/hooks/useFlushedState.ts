@@ -23,6 +23,8 @@
  * https://react.dev/reference/react-dom/flushSync
  */
 
+// DEPRECATED. DELETE THIS ON NEXT VERSION WHEN NO PROBLEMS CONFIRMED
+
 import { useState } from "react";
 import { flushSync } from "react-dom";
 

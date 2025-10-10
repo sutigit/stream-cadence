@@ -5,8 +5,8 @@ import { memo, ReactNode, useEffect, useState } from "react"
 // - [x] Performance: collapse old spans to text chunks, keep styled or component spans as they are.
 // - [] accomodate styled
 // - [] accomodate component 
-// - [] where the hell did my fadeIn go
-// - [] use something else than flushSync.... try animationInterval then...
+// - [X] where the hell did my fadeIn go
+// - [X] use something else than flushSync.... try animationInterval then...
 
 // ROADMAP THINGS
 // - add markdown parser
@@ -18,7 +18,6 @@ const StreamNice: React.FC<StreamNiceProps> = ({ next, inStream, ...rest }) => {
 
     const defineComponent = (componentId: string, target: string) => {
         const Component = inStream?.[componentId]
-        console.log("📌 haloo!", Component)
 
         return Component ? <Component id={componentId} match={target} /> : <span style={{ color: '#E11D48' }}>Invalid {componentId}</span>
     }
