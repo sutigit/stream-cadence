@@ -19,7 +19,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${font.className} antialised`}>
-        <nav className="container mx-auto py-5 flex justify-end">
+        <nav className="container mx-auto py-6 flex justify-between">
+          <div className="flex gap-5">
+            <Link className="font-bold" href="/">Package</Link>
+            <Link href="/">Learn</Link>
+            <Link href="/">Reference</Link>
+            <Link href="/">Examples</Link>
+          </div>
           <Link
             href="https://github.com/sutigit/stream-cadence"
             target="_blank"
