@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils'
-import { Slider } from '@radix-ui/react-slider'
-import { Switch } from '@radix-ui/react-switch'
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider"
+import { Switch } from "@/components/ui/switch"
 import React, { useState } from 'react'
 
 export default function Header() {
